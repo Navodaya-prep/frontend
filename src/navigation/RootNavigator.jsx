@@ -23,6 +23,7 @@ import MockTestStartScreen from '../screens/app/MockTestStartScreen';
 import MockTestScreen from '../screens/app/MockTestScreen';
 import MockTestResultScreen from '../screens/app/MockTestResultScreen';
 import LeaderboardScreen from '../screens/app/LeaderboardScreen';
+import LiveClassScreen from '../screens/app/LiveClassScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -60,7 +61,7 @@ export default function RootNavigator() {
               options={{ presentation: 'modal' }}
             />
 
-            {/* Mock Test flow: List → Start → Take → Result */}
+            {/* Mock Test flow */}
             <Stack.Screen name="MockTestList" component={MockTestListScreen} />
             <Stack.Screen name="MockTestStart" component={MockTestStartScreen} />
             <Stack.Screen
@@ -68,12 +69,16 @@ export default function RootNavigator() {
               component={MockTestScreen}
               options={{ presentation: 'fullScreenModal', gestureEnabled: false }}
             />
-            <Stack.Screen
-              name="MockTestResult"
-              component={MockTestResultScreen}
-            />
+            <Stack.Screen name="MockTestResult" component={MockTestResultScreen} />
 
             <Stack.Screen name="Leaderboard" component={LeaderboardScreen} />
+
+            {/* Live Class */}
+            <Stack.Screen
+              name="LiveClass"
+              component={LiveClassScreen}
+              options={{ presentation: 'fullScreenModal', gestureEnabled: false }}
+            />
           </>
         )}
       </Stack.Navigator>
