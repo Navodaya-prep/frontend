@@ -93,22 +93,7 @@ export default function LiveClassScreen({ route, navigation }) {
     setActiveQuiz(null);
   }
 
-  const youtubeHtml = `
-    <!DOCTYPE html>
-    <html>
-    <head><meta name="viewport" content="width=device-width, initial-scale=1"><style>
-      * { margin:0; padding:0; box-sizing:border-box; }
-      body { background:#000; }
-      iframe { width:100%; height:100vh; border:none; }
-    </style></head>
-    <body>
-      <iframe src="https://www.youtube.com/embed/${classData.youtubeVideoId}?autoplay=1&playsinline=1"
-        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-        allowfullscreen>
-      </iframe>
-    </body>
-    </html>
-  `;
+  const youtubeUri = `https://www.youtube.com/watch?v=${classData.youtubeVideoId}`;
 
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
@@ -129,11 +114,12 @@ export default function LiveClassScreen({ route, navigation }) {
       {/* YouTube Player */}
       <View style={styles.player}>
         <WebView
-          source={{ html: youtubeHtml }}
+          source={{ uri: youtubeUri }}
           style={{ flex: 1 }}
           allowsInlineMediaPlayback
           mediaPlaybackRequiresUserAction={false}
           javaScriptEnabled
+          userAgent="Mozilla/5.0 (Linux; Android 10; Mobile) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36"
         />
       </View>
 
