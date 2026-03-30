@@ -13,7 +13,7 @@ import { SUBJECTS } from '../../utils/constants';
 
 const BIG_FOUR = [
   { id: 'recorded', icon: '🎥', title: 'Recorded Classes', subtitle: 'Learn at your pace', color: colors.primary, screen: 'Courses' },
-  { id: 'live', icon: '🔴', title: 'Live Classes', subtitle: 'Join now!', color: colors.error, live: true, screen: 'Courses' },
+  { id: 'live', icon: '🔴', title: 'Live Classes', subtitle: 'Join now!', color: colors.error, live: true, tab: 'Live' },
   { id: 'practice', icon: '📋', title: 'Practice Hub', subtitle: '1200+ MCQs', color: colors.accent, screen: 'PracticeMCQ' },
   { id: 'mock', icon: '📊', title: 'Mock Tests', subtitle: 'Full-length exams', color: colors.success, screen: 'MockTestList' },
 ];
@@ -74,7 +74,7 @@ export default function DashboardScreen({ navigation }) {
             <TouchableOpacity
               key={item.id}
               style={[styles.bigFourCard, { borderTopColor: item.color }]}
-              onPress={() => navigation.navigate(item.screen)}
+              onPress={() => item.tab ? navigation.navigate('Dashboard', { screen: item.tab }) : navigation.navigate(item.screen)}
               activeOpacity={0.8}
             >
               <View style={styles.bigFourIconRow}>
