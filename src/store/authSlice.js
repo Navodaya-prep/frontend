@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { authApi } from '../api/authApi';
+import { profileApi } from '../api/profileApi';
 import { storage } from '../utils/storage';
 
 export const sendOtp = createAsyncThunk('auth/sendOtp', async (phone, { rejectWithValue }) => {
@@ -38,6 +39,16 @@ export const signup = createAsyncThunk('auth/signup', async (payload, { rejectWi
 export const loadStoredAuth = createAsyncThunk('auth/loadStored', async () => {
   const [token, user] = await Promise.all([storage.getToken(), storage.getUser()]);
   return { token, user };
+});
+
+export const fetchProfile = createAsyncThunk('auth/fetchProfile', async (_, { rejectWithValue }) => {
+  try {
+    const res = await profileApi.getProfile();
+    await storage.setUser(res.data.user);
+    return res.data;
+  } catch (err) {
+    return rejectWithValue(err.response?.data?.message || 'Failed to fetch profile');
+  }
 });
 
 export const logout = createAsyncThunk('auth/logout', async () => {
@@ -95,6 +106,10 @@ const authSlice = createSlice({
           state.user = action.payload.user;
           state.isAuthenticated = true;
         }
+      })
+
+      .addCase(fetchProfile.fulfilled, (state, action) => {
+        state.user = action.payload.user;
       })
 
       .addCase(logout.fulfilled, (state) => {

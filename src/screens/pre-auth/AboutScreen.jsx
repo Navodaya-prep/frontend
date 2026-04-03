@@ -86,7 +86,7 @@ export default function AboutScreen({ navigation }) {
           ))}
         </View>
 
-        <TouchableOpacity style={styles.ctaBtn} onPress={() => navigation.navigate('Signup')}>
+        <TouchableOpacity style={styles.ctaBtn} onPress={() => navigation.navigate('Login')}>
           <Text style={styles.ctaBtnText}>Join 50,000+ Students →</Text>
         </TouchableOpacity>
       </ScrollView>
@@ -144,8 +144,17 @@ const styles = StyleSheet.create({
   milestoneYear: { fontSize: typography.sizes.sm, fontWeight: typography.weights.bold, color: colors.accent },
   milestoneEvent: { fontSize: typography.sizes.md, color: colors.text },
   ctaBtn: {
-    backgroundColor: colors.primary, margin: spacing.md, marginBottom: spacing.xl,
-    borderRadius: radius.md, paddingVertical: 16, alignItems: 'center',
+    backgroundColor: colors.primary, 
+    margin: spacing.md, 
+    marginBottom: spacing.xl,
+    borderRadius: radius.lg, 
+    paddingVertical: 18, 
+    alignItems: 'center',
+    elevation: 4,
+    shadowColor: colors.primary,
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 4 },
   },
-  ctaBtnText: { color: colors.white, fontSize: typography.sizes.lg, fontWeight: typography.weights.extrabold },
+  ctaBtnText: { color: colors.white, fontSize: typography.sizes.lg, fontWeight: typography.weights.extrabold, letterSpacing: 0.5 },
 });

@@ -24,6 +24,13 @@ import MockTestScreen from '../screens/app/MockTestScreen';
 import MockTestResultScreen from '../screens/app/MockTestResultScreen';
 import LeaderboardScreen from '../screens/app/LeaderboardScreen';
 import LiveClassScreen from '../screens/app/LiveClassScreen';
+import PracticeSubjectsScreen from '../screens/app/PracticeSubjectsScreen';
+import PracticeChaptersScreen from '../screens/app/PracticeChaptersScreen';
+import PracticeChapterDetailScreen from '../screens/app/PracticeChapterDetailScreen';
+import CourseDetailScreen from '../screens/app/CourseDetailScreen';
+import ChapterLessonsScreen from '../screens/app/ChapterLessonsScreen';
+import LessonPlayerScreen from '../screens/app/LessonPlayerScreen';
+import DailyChallengeScreen from '../screens/app/DailyChallengeScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -73,10 +80,27 @@ export default function RootNavigator() {
 
             <Stack.Screen name="Leaderboard" component={LeaderboardScreen} />
 
+            {/* Daily Challenge */}
+            <Stack.Screen name="DailyChallenge" component={DailyChallengeScreen} />
+
             {/* Live Class */}
             <Stack.Screen
               name="LiveClass"
               component={LiveClassScreen}
+              options={{ presentation: 'fullScreenModal', gestureEnabled: false }}
+            />
+
+            {/* Practice Hub */}
+            <Stack.Screen name="PracticeSubjects" component={PracticeSubjectsScreen} />
+            <Stack.Screen name="PracticeChapters" component={PracticeChaptersScreen} />
+            <Stack.Screen name="PracticeChapterDetail" component={PracticeChapterDetailScreen} />
+
+            {/* Recorded Classes */}
+            <Stack.Screen name="CourseDetail" component={CourseDetailScreen} />
+            <Stack.Screen name="ChapterLessons" component={ChapterLessonsScreen} />
+            <Stack.Screen
+              name="LessonPlayer"
+              component={LessonPlayerScreen}
               options={{ presentation: 'fullScreenModal', gestureEnabled: false }}
             />
           </>

@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import {
   View, Text, ScrollView, TouchableOpacity, StyleSheet, RefreshControl,
 } from 'react-native';
@@ -6,6 +6,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchMockTests } from '../../store/mockTestSlice';
 import { fetchCourses } from '../../store/courseSlice';
+import { fetchProfile } from '../../store/authSlice';
+import { fetchSettings } from '../../store/settingsSlice';
 import { colors } from '../../theme/colors';
 import { typography } from '../../theme/typography';
 import { radius, spacing } from '../../theme/spacing';
@@ -14,7 +16,7 @@ import { SUBJECTS } from '../../utils/constants';
 const BIG_FOUR = [
   { id: 'recorded', icon: '🎥', title: 'Recorded Classes', subtitle: 'Learn at your pace', color: colors.primary, screen: 'Courses' },
   { id: 'live', icon: '🔴', title: 'Live Classes', subtitle: 'Join now!', color: colors.error, live: true, tab: 'Live' },
-  { id: 'practice', icon: '📋', title: 'Practice Hub', subtitle: '1200+ MCQs', color: colors.accent, screen: 'PracticeMCQ' },
+  { id: 'practice', icon: '📋', title: 'Practice Hub', subtitle: '1200+ MCQs', color: colors.accent, screen: 'PracticeSubjects' },
   { id: 'mock', icon: '📊', title: 'Mock Tests', subtitle: 'Full-length exams', color: colors.success, screen: 'MockTestList' },
 ];
 
@@ -22,18 +24,39 @@ export default function DashboardScreen({ navigation }) {
   const dispatch = useDispatch();
   const { user } = useSelector((s) => s.auth);
   const { tests } = useSelector((s) => s.mockTest);
+  const { examDate, examName } = useSelector((s) => s.settings);
   const [refreshing, setRefreshing] = React.useState(false);
 
   useEffect(() => {
     dispatch(fetchCourses());
     dispatch(fetchMockTests());
+    dispatch(fetchProfile());
+    dispatch(fetchSettings());
   }, []);
 
   const onRefresh = async () => {
     setRefreshing(true);
-    await Promise.all([dispatch(fetchCourses()), dispatch(fetchMockTests())]);
+    await Promise.all([
+      dispatch(fetchCourses()),
+      dispatch(fetchMockTests()),
+      dispatch(fetchProfile()),
+      dispatch(fetchSettings()),
+    ]);
     setRefreshing(false);
   };
+
+  // Calculate days left dynamically
+  const daysLeft = useMemo(() => {
+    console.log('Calculating days left. examDate:', examDate);
+    if (!examDate) return null;
+    const today = new Date();
+    const exam = new Date(examDate);
+    console.log('Today:', today, 'Exam:', exam);
+    const diffTime = exam - today;
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    console.log('Days left:', diffDays);
+    return diffDays > 0 ? diffDays : 0;
+  }, [examDate]);
 
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
@@ -50,7 +73,7 @@ export default function DashboardScreen({ navigation }) {
           </View>
           <View style={styles.streakBadge}>
             <Text style={styles.streakFire}>🔥</Text>
-            <Text style={styles.streakNum}>5</Text>
+            <Text style={styles.streakNum}>{user?.streak || 0}</Text>
             <Text style={styles.streakLabel}>day streak</Text>
           </View>
         </View>
@@ -58,11 +81,11 @@ export default function DashboardScreen({ navigation }) {
         {/* Exam Countdown */}
         <View style={styles.countdownBanner}>
           <View>
-            <Text style={styles.countdownTitle}>JNVST 2025</Text>
+            <Text style={styles.countdownTitle}>{examName || 'JNVST 2026'}</Text>
             <Text style={styles.countdownSub}>Stay consistent · Stay ahead</Text>
           </View>
           <View style={styles.countdownBadge}>
-            <Text style={styles.countdownDays}>87</Text>
+            <Text style={styles.countdownDays}>{daysLeft !== null ? daysLeft : '—'}</Text>
             <Text style={styles.countdownDaysLabel}>days left</Text>
           </View>
         </View>
@@ -114,28 +137,29 @@ export default function DashboardScreen({ navigation }) {
         ))}
 
         {/* Daily Challenge */}
-        <View style={styles.challengeCard}>
+        <TouchableOpacity
+          style={styles.challengeCard}
+          onPress={() => navigation.navigate('DailyChallenge')}
+          activeOpacity={0.8}
+        >
           <View style={styles.challengeLeft}>
             <Text style={styles.challengeEmoji}>⚡</Text>
             <View>
               <Text style={styles.challengeTitle}>Daily Challenge</Text>
-              <Text style={styles.challengeSub}>Solve 5 questions · Earn 50 star points</Text>
+              <Text style={styles.challengeSub}>Solve today's question · Earn up to 150 pts</Text>
             </View>
           </View>
-          <TouchableOpacity
-            style={styles.challengeBtn}
-            onPress={() => navigation.navigate('PracticeMCQ')}
-          >
+          <View style={styles.challengeBtn}>
             <Text style={styles.challengeBtnText}>Go!</Text>
-          </TouchableOpacity>
-        </View>
+          </View>
+        </TouchableOpacity>
 
         {/* Leaderboard Preview */}
         <TouchableOpacity style={styles.leaderboardBanner} onPress={() => navigation.navigate('Leaderboard')}>
           <Text style={styles.leaderboardIcon}>🏆</Text>
           <View style={{ flex: 1 }}>
-            <Text style={styles.leaderboardTitle}>Weekly Leaderboard</Text>
-            <Text style={styles.leaderboardSub}>See how you rank in your district</Text>
+            <Text style={styles.leaderboardTitle}>Challenge Leaderboard</Text>
+            <Text style={styles.leaderboardSub}>See how you rank today & this month</Text>
           </View>
           <Text style={styles.leaderboardArrow}>→</Text>
         </TouchableOpacity>

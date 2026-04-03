@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Alert, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useDispatch, useSelector } from 'react-redux';
-import { logout } from '../../store/authSlice';
+import { logout, fetchProfile } from '../../store/authSlice';
+import { profileApi } from '../../api/profileApi';
 import { colors } from '../../theme/colors';
 import { typography } from '../../theme/typography';
 import { radius, spacing } from '../../theme/spacing';
@@ -20,6 +21,23 @@ const MENU_ITEMS = [
 export default function ProfileScreen({ navigation }) {
   const dispatch = useDispatch();
   const { user } = useSelector((s) => s.auth);
+  const [stats, setStats] = useState({ totalTests: 0, totalScore: 0, bestScore: 0 });
+
+  useEffect(() => {
+    loadProfile();
+  }, []);
+
+  const loadProfile = async () => {
+    try {
+      const res = await profileApi.getProfile();
+      if (res.data?.stats) {
+        setStats(res.data.stats);
+      }
+      dispatch(fetchProfile());
+    } catch (error) {
+      console.error('Failed to load profile:', error);
+    }
+  };
 
   const handleLogout = () => {
     Alert.alert('Logout', 'Are you sure you want to logout?', [
@@ -56,7 +74,11 @@ export default function ProfileScreen({ navigation }) {
 
         {/* Stats */}
         <View style={styles.statsRow}>
-          {[['12', 'Tests Done'], ['850', 'Star Points'], ['7', 'Day Streak']].map(([val, label]) => (
+          {[
+            [stats.totalTests || 0, 'Tests Done'],
+            [user?.starPoints || 0, 'Star Points'],
+            [user?.streak || 0, 'Day Streak']
+          ].map(([val, label]) => (
             <View key={label} style={styles.statItem}>
               <Text style={styles.statVal}>{val}</Text>
               <Text style={styles.statLabel}>{label}</Text>

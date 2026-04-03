@@ -43,8 +43,8 @@ export default function LoginScreen({ navigation }) {
             <Text style={styles.logoSub}>Welcome back!</Text>
           </View>
 
-          <Text style={styles.title}>Login to your account</Text>
-          <Text style={styles.subtitle}>We'll send a verification code to your mobile number</Text>
+          <Text style={styles.title}>Login or Sign Up</Text>
+          <Text style={styles.subtitle}>Enter your mobile number to get started. New users will be registered automatically.</Text>
 
           <Text style={styles.label}>Mobile Number</Text>
           <View style={styles.phoneInputRow}>
@@ -65,15 +65,11 @@ export default function LoginScreen({ navigation }) {
           {error && <Text style={styles.errorText}>{error}</Text>}
 
           <AppButton
-            title="Send OTP →"
+            title="Continue →"
             onPress={handleSendOtp}
             loading={status === 'loading'}
             style={styles.btn}
           />
-
-          <Text style={styles.hint}>
-            New student? Just enter your number — we'll create your account automatically.
-          </Text>
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
@@ -106,5 +102,4 @@ const styles = StyleSheet.create({
   phoneInput: { flex: 1, padding: spacing.md, fontSize: typography.sizes.lg, color: colors.text },
   errorText: { color: colors.error, fontSize: typography.sizes.sm, marginBottom: spacing.md },
   btn: { marginBottom: spacing.lg },
-  hint: { fontSize: typography.sizes.sm, color: colors.textSecondary, textAlign: 'center', lineHeight: 20 },
 });

@@ -12,7 +12,7 @@ import { colors } from '../../theme/colors';
 import { typography } from '../../theme/typography';
 import { spacing, radius } from '../../theme/spacing';
 
-const WS_BASE = 'wss://backend-prnk.onrender.com';
+const WS_BASE = 'ws://localhost:8080';
 const { height } = Dimensions.get('window');
 
 export default function LiveClassScreen({ route, navigation }) {

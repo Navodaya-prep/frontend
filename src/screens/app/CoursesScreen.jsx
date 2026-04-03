@@ -65,7 +65,7 @@ export default function CoursesScreen({ navigation }) {
         ? <AppLoader />
         : <FlatList
             data={courses}
-            keyExtractor={(item) => item._id}
+            keyExtractor={(item) => item.id || item._id}
             contentContainerStyle={styles.list}
             renderItem={({ item }) => (
               <TouchableOpacity
