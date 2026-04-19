@@ -9,13 +9,12 @@ import { typography } from '../../theme/typography';
 import { radius, spacing } from '../../theme/spacing';
 
 const MENU_ITEMS = [
-  { icon: '📊', title: 'My Progress', subtitle: 'View your performance analytics' },
-  { icon: '🏆', title: 'My Achievements', subtitle: 'Badges and star points earned' },
-  { icon: '📥', title: 'Downloaded Content', subtitle: 'Offline videos and PDFs' },
-  { icon: '🔔', title: 'Notifications', subtitle: 'Class reminders and updates' },
-  { icon: '🌐', title: 'Language', subtitle: 'Hindi / English' },
-  { icon: '🔒', title: 'Privacy Policy', subtitle: 'Read our privacy policy' },
-  { icon: '📞', title: 'Help & Support', subtitle: 'Contact us for help' },
+  { icon: '📊', title: 'My Progress', subtitle: 'View your performance analytics', screen: 'Analytics' },
+  { icon: '🔖', title: 'Bookmarks', subtitle: 'Saved questions for revision', screen: 'Bookmarks' },
+  { icon: '🏆', title: 'My Achievements', subtitle: 'Badges and star points earned', screen: null },
+  { icon: '🔔', title: 'Notifications', subtitle: 'Class reminders and updates', screen: null },
+  { icon: '🔒', title: 'Privacy Policy', subtitle: 'Read our privacy policy', screen: null },
+  { icon: '📞', title: 'Help & Support', subtitle: 'Contact us for help', screen: null },
 ];
 
 export default function ProfileScreen({ navigation }) {
@@ -67,7 +66,7 @@ export default function ProfileScreen({ navigation }) {
               <Text style={styles.tagText}>{user?.state || 'India'}</Text>
             </View>
           </View>
-          <TouchableOpacity style={styles.editBtn}>
+          <TouchableOpacity style={styles.editBtn} onPress={() => navigation.navigate('EditProfile')}>
             <Text style={styles.editBtnText}>Edit Profile</Text>
           </TouchableOpacity>
         </View>
@@ -99,13 +98,18 @@ export default function ProfileScreen({ navigation }) {
         {/* Menu */}
         <View style={styles.menu}>
           {MENU_ITEMS.map((item) => (
-            <TouchableOpacity key={item.title} style={styles.menuItem}>
+            <TouchableOpacity
+              key={item.title}
+              style={[styles.menuItem, !item.screen && styles.menuItemDisabled]}
+              onPress={() => item.screen && navigation.navigate(item.screen)}
+              activeOpacity={item.screen ? 0.7 : 1}
+            >
               <Text style={styles.menuIcon}>{item.icon}</Text>
               <View style={styles.menuInfo}>
-                <Text style={styles.menuTitle}>{item.title}</Text>
+                <Text style={[styles.menuTitle, !item.screen && styles.menuTitleDisabled]}>{item.title}</Text>
                 <Text style={styles.menuSubtitle}>{item.subtitle}</Text>
               </View>
-              <Text style={styles.menuArrow}>›</Text>
+              <Text style={[styles.menuArrow, !item.screen && { opacity: 0.3 }]}>›</Text>
             </TouchableOpacity>
           ))}
         </View>
@@ -169,6 +173,8 @@ const styles = StyleSheet.create({
   menuTitle: { fontSize: typography.sizes.md, fontWeight: typography.weights.semibold, color: colors.text },
   menuSubtitle: { fontSize: typography.sizes.xs, color: colors.textSecondary, marginTop: 2 },
   menuArrow: { fontSize: typography.sizes.xl, color: colors.textLight },
+  menuItemDisabled: { opacity: 0.5 },
+  menuTitleDisabled: { color: colors.textSecondary },
   logoutBtn: {
     margin: spacing.md, borderRadius: radius.md, paddingVertical: 14,
     alignItems: 'center', borderWidth: 2, borderColor: colors.error,

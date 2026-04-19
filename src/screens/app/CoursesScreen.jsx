@@ -30,7 +30,7 @@ export default function CoursesScreen({ navigation }) {
 
   useEffect(() => { dispatch(fetchCourses()); }, []);
 
-  const courses = (list.length > 0 ? list : SAMPLE_COURSES).filter(
+  const courses = list.filter(
     (c) => filter === 'all' || c.subject === filter
   );
 

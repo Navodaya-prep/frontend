@@ -92,12 +92,17 @@ export default function MockTestScreen({ navigation }) {
       return;
     }
 
+    const skipped = total - answeredCount;
+    const message = skipped > 0
+      ? `⚠️ You have ${skipped} unanswered question${skipped > 1 ? 's' : ''}!\n\nAnswered: ${answeredCount}/${total}\n\nUnanswered questions will be marked wrong.`
+      : `All ${total} questions answered.\n\nReady to submit?`;
+
     Alert.alert(
-      'Submit Test?',
-      `Answered: ${answeredCount}/${total}\nSkipped: ${total - answeredCount}\n\nAre you sure you want to submit?`,
+      skipped > 0 ? 'Warning: Unanswered Questions' : 'Submit Test?',
+      message,
       [
-        { text: 'Review', style: 'cancel' },
-        { text: 'Submit', onPress: proceed },
+        { text: skipped > 0 ? 'Go Back & Answer' : 'Review', style: 'cancel' },
+        { text: 'Submit Anyway', style: skipped > 0 ? 'destructive' : 'default', onPress: proceed },
       ]
     );
   };

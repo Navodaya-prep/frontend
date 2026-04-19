@@ -30,7 +30,7 @@ export default function PracticeChapterDetailScreen({ route, navigation }) {
   const { chapter, subject } = route.params;
   const dispatch = useDispatch();
   const { questions, solvedIds, loading, error } = useSelector((s) => s.practiceHub);
-  const [activeTab, setActiveTab] = useState('open'); // 'open' | 'solved'
+  const [activeTab, setActiveTab] = useState('open'); // 'open' | 'solved' | 'pyq'
 
   useEffect(() => {
     dispatch(fetchChapterQuestions(chapter.id));
@@ -40,7 +40,10 @@ export default function PracticeChapterDetailScreen({ route, navigation }) {
   const solvedSet = new Set(solvedIds);
   const openQuestions = questions.filter((q) => !solvedSet.has(q.id));
   const solvedQuestions = questions.filter((q) => solvedSet.has(q.id));
-  const displayedQuestions = activeTab === 'open' ? openQuestions : solvedQuestions;
+  const pyqQuestions = questions.filter((q) => q.isPYQ);
+  const displayedQuestions = activeTab === 'open' ? openQuestions
+    : activeTab === 'solved' ? solvedQuestions
+    : pyqQuestions;
 
   function startPractice(startingQuestions) {
     if (startingQuestions.length === 0) return;
@@ -96,26 +99,30 @@ export default function PracticeChapterDetailScreen({ route, navigation }) {
           <Text style={[styles.statNum, { color: colors.success }]}>{solvedQuestions.length}</Text>
           <Text style={styles.statLabel}>Solved</Text>
         </View>
+        <View style={styles.statDivider} />
+        <View style={styles.statItem}>
+          <Text style={[styles.statNum, { color: colors.accent }]}>{pyqQuestions.length}</Text>
+          <Text style={styles.statLabel}>PYQ</Text>
+        </View>
       </View>
 
       {/* Tabs */}
       <View style={styles.tabBar}>
-        <TouchableOpacity
-          style={[styles.tab, activeTab === 'open' && styles.tabActive]}
-          onPress={() => setActiveTab('open')}
-        >
-          <Text style={[styles.tabText, activeTab === 'open' && styles.tabTextActive]}>
-            Open ({openQuestions.length})
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[styles.tab, activeTab === 'solved' && styles.tabActive]}
-          onPress={() => setActiveTab('solved')}
-        >
-          <Text style={[styles.tabText, activeTab === 'solved' && styles.tabTextActive]}>
-            Solved ({solvedQuestions.length})
-          </Text>
-        </TouchableOpacity>
+        {[
+          { key: 'open', label: `Open (${openQuestions.length})` },
+          { key: 'solved', label: `Solved (${solvedQuestions.length})` },
+          { key: 'pyq', label: `PYQ (${pyqQuestions.length})` },
+        ].map((tab) => (
+          <TouchableOpacity
+            key={tab.key}
+            style={[styles.tab, activeTab === tab.key && styles.tabActive]}
+            onPress={() => setActiveTab(tab.key)}
+          >
+            <Text style={[styles.tabText, activeTab === tab.key && styles.tabTextActive]}>
+              {tab.label}
+            </Text>
+          </TouchableOpacity>
+        ))}
       </View>
 
       {loading && questions.length === 0 && <AppLoader />}
@@ -136,13 +143,19 @@ export default function PracticeChapterDetailScreen({ route, navigation }) {
         ListEmptyComponent={
           !loading && (
             <View style={styles.empty}>
-              <Text style={styles.emptyIcon}>{activeTab === 'solved' ? '🏆' : '📝'}</Text>
+              <Text style={styles.emptyIcon}>
+                {activeTab === 'solved' ? '🏆' : activeTab === 'pyq' ? '📅' : '📝'}
+              </Text>
               <Text style={styles.emptyTitle}>
-                {activeTab === 'solved' ? 'No solved questions yet' : 'All questions solved!'}
+                {activeTab === 'solved' ? 'No solved questions yet'
+                  : activeTab === 'pyq' ? 'No PYQ questions in this chapter'
+                  : 'All questions solved!'}
               </Text>
               <Text style={styles.emptySub}>
                 {activeTab === 'solved'
                   ? 'Start practicing to track your progress'
+                  : activeTab === 'pyq'
+                  ? 'Previous year questions will appear here'
                   : 'Great work! Switch to Solved tab to review'}
               </Text>
             </View>
@@ -161,7 +174,9 @@ export default function PracticeChapterDetailScreen({ route, navigation }) {
             <Text style={styles.ctaBtnText}>
               {activeTab === 'open'
                 ? `Practice ${openQuestions.length} Open Questions`
-                : `Review ${solvedQuestions.length} Solved Questions`}
+                : activeTab === 'solved'
+                ? `Review ${solvedQuestions.length} Solved Questions`
+                : `Practice ${pyqQuestions.length} PYQ Questions`}
             </Text>
           </TouchableOpacity>
         </View>

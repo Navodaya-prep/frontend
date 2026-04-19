@@ -31,6 +31,8 @@ import CourseDetailScreen from '../screens/app/CourseDetailScreen';
 import ChapterLessonsScreen from '../screens/app/ChapterLessonsScreen';
 import LessonPlayerScreen from '../screens/app/LessonPlayerScreen';
 import DailyChallengeScreen from '../screens/app/DailyChallengeScreen';
+import EditProfileScreen from '../screens/app/EditProfileScreen';
+import AnalyticsScreen from '../screens/app/AnalyticsScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -94,6 +96,10 @@ export default function RootNavigator() {
             <Stack.Screen name="PracticeSubjects" component={PracticeSubjectsScreen} />
             <Stack.Screen name="PracticeChapters" component={PracticeChaptersScreen} />
             <Stack.Screen name="PracticeChapterDetail" component={PracticeChapterDetailScreen} />
+
+            {/* Profile */}
+            <Stack.Screen name="EditProfile" component={EditProfileScreen} />
+            <Stack.Screen name="Analytics" component={AnalyticsScreen} />
 
             {/* Recorded Classes */}
             <Stack.Screen name="CourseDetail" component={CourseDetailScreen} />

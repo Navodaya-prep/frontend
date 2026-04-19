@@ -9,6 +9,9 @@ import leaderboardReducer from './leaderboardSlice';
 import liveClassReducer from './liveClassSlice';
 import settingsReducer from './settingsSlice';
 import dailyChallengeReducer from './dailyChallengeSlice';
+import doubtsReducer from './doubtsSlice';
+import analyticsReducer from './analyticsSlice';
+import bookmarksReducer from './bookmarkSlice';
 
 export const store = configureStore({
   reducer: {
@@ -22,6 +25,9 @@ export const store = configureStore({
     liveClass: liveClassReducer,
     settings: settingsReducer,
     dailyChallenge: dailyChallengeReducer,
+    doubts: doubtsReducer,
+    analytics: analyticsReducer,
+    bookmarks: bookmarksReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({ serializableCheck: false }),

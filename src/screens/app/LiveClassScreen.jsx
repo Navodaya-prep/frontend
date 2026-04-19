@@ -12,7 +12,8 @@ import { colors } from '../../theme/colors';
 import { typography } from '../../theme/typography';
 import { spacing, radius } from '../../theme/spacing';
 
-const WS_BASE = 'ws://localhost:8080';
+import { WS_BASE_URL } from '../../config';
+const WS_BASE = WS_BASE_URL;
 const { height } = Dimensions.get('window');
 
 export default function LiveClassScreen({ route, navigation }) {
