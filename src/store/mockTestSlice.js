@@ -55,7 +55,11 @@ const mockTestSlice = createSlice({
   reducers: {
     selectAnswer: (state, action) => {
       const { questionIndex, optionIndex } = action.payload;
-      state.answers[questionIndex] = optionIndex;
+      if (state.answers[questionIndex] === optionIndex) {
+        delete state.answers[questionIndex]; // tap same option again → deselect
+      } else {
+        state.answers[questionIndex] = optionIndex;
+      }
       storage.saveMockTestState({
         testId: state.activeTest?.id,
         answers: state.answers,

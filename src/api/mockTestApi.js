@@ -6,4 +6,5 @@ export const mockTestApi = {
   submitTest: (testId, answers, timeTaken) =>
     client.post(`/mocktests/${testId}/submit`, { answers, timeTaken }),
   getUserAttempts: () => client.get('/mocktests/attempts'),
+  getAttemptDetails: (attemptId) => client.get(`/mocktests/attempts/${attemptId}`),
 };
