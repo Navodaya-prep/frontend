@@ -1,8 +1,8 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import DashboardScreen from '../screens/app/DashboardScreen';
-import CoursesScreen from '../screens/app/CoursesScreen';
 import DoubtsScreen from '../screens/app/DoubtsScreen';
 import ProfileScreen from '../screens/app/ProfileScreen';
 import LiveClassesScreen from '../screens/app/LiveClassesScreen';
@@ -13,20 +13,21 @@ const Tab = createBottomTabNavigator();
 
 const TAB_ICONS = {
   Home: { active: '🏠', inactive: '🏡' },
-  Courses: { active: '📚', inactive: '📖' },
-  Live: { active: '🔴', inactive: '📡' },
+  Live: { active: '🔴', inactive: '🎥' },
   Doubts: { active: '💬', inactive: '💭' },
   Profile: { active: '👤', inactive: '👥' },
 };
 
 export default function BottomTabNavigator() {
+  const insets = useSafeAreaInsets();
+
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
         headerShown: false,
         tabBarActiveTintColor: colors.primary,
         tabBarInactiveTintColor: colors.textLight,
-        tabBarStyle: styles.tabBar,
+        tabBarStyle: [styles.tabBar, { height: 60 + insets.bottom, paddingBottom: insets.bottom + 8 }],
         tabBarLabelStyle: styles.tabLabel,
         tabBarIcon: ({ focused }) => (
           <Text style={{ fontSize: 22 }}>
@@ -36,7 +37,6 @@ export default function BottomTabNavigator() {
       })}
     >
       <Tab.Screen name="Home" component={DashboardScreen} />
-      <Tab.Screen name="Courses" component={CoursesScreen} />
       <Tab.Screen name="Live" component={LiveClassesScreen} />
       <Tab.Screen name="Doubts" component={DoubtsScreen} />
       <Tab.Screen name="Profile" component={ProfileScreen} />
@@ -49,8 +49,6 @@ const styles = StyleSheet.create({
     backgroundColor: colors.white,
     borderTopWidth: 1,
     borderTopColor: colors.border,
-    height: 60,
-    paddingBottom: 8,
     paddingTop: 4,
   },
   tabLabel: {

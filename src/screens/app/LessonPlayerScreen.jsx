@@ -33,7 +33,7 @@ export default function LessonPlayerScreen({ route, navigation }) {
 
   const isVideo = lesson.type === 'video';
   const youtubeUri = isVideo && lesson.youtubeVideoId
-    ? `https://www.youtube.com/watch?v=${lesson.youtubeVideoId}`
+    ? `https://www.youtube.com/embed/${lesson.youtubeVideoId}?playsinline=1&rel=0&autoplay=1`
     : null;
 
   return (
@@ -61,9 +61,10 @@ export default function LessonPlayerScreen({ route, navigation }) {
             source={{ uri: youtubeUri }}
             style={{ flex: 1 }}
             allowsInlineMediaPlayback
+            allowsFullscreenVideo
             mediaPlaybackRequiresUserAction={false}
             javaScriptEnabled
-            userAgent="Mozilla/5.0 (Linux; Android 10; Mobile) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36"
+            originWhitelist={['*']}
           />
         </View>
       ) : isVideo ? (

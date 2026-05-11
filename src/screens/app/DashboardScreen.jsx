@@ -6,15 +6,14 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchMockTests } from '../../store/mockTestSlice';
 import { fetchCourses } from '../../store/courseSlice';
+import { fetchSubjects } from '../../store/practiceHubSlice';
 import { fetchProfile } from '../../store/authSlice';
 import { fetchSettings } from '../../store/settingsSlice';
 import { colors } from '../../theme/colors';
 import { typography } from '../../theme/typography';
 import { radius, spacing } from '../../theme/spacing';
-import { SUBJECTS } from '../../utils/constants';
-
 const BIG_FOUR = [
-  { id: 'recorded', icon: '🎥', title: 'Recorded Classes', subtitle: 'Learn at your pace', color: colors.primary, screen: 'Courses' },
+  { id: 'recorded', icon: '🎥', title: 'Recorded Classes', subtitle: 'Learn at your pace', color: colors.primary, screen: 'RecordedClasses' },
   { id: 'live', icon: '🔴', title: 'Live Classes', subtitle: 'Join now!', color: colors.error, live: true, tab: 'Live' },
   { id: 'practice', icon: '📋', title: 'Practice Hub', subtitle: '1200+ MCQs', color: colors.accent, screen: 'PracticeSubjects' },
   { id: 'mock', icon: '📊', title: 'Mock Tests', subtitle: 'Full-length exams', color: colors.success, screen: 'MockTestList' },
@@ -24,11 +23,13 @@ export default function DashboardScreen({ navigation }) {
   const dispatch = useDispatch();
   const { user } = useSelector((s) => s.auth);
   const { tests } = useSelector((s) => s.mockTest);
+  const { subjects } = useSelector((s) => s.practiceHub);
   const { examDate, examName } = useSelector((s) => s.settings);
   const [refreshing, setRefreshing] = React.useState(false);
 
   useEffect(() => {
     dispatch(fetchCourses());
+    dispatch(fetchSubjects());
     dispatch(fetchMockTests());
     dispatch(fetchProfile());
     dispatch(fetchSettings());
@@ -38,6 +39,7 @@ export default function DashboardScreen({ navigation }) {
     setRefreshing(true);
     await Promise.all([
       dispatch(fetchCourses()),
+      dispatch(fetchSubjects()),
       dispatch(fetchMockTests()),
       dispatch(fetchProfile()),
       dispatch(fetchSettings()),
@@ -114,27 +116,38 @@ export default function DashboardScreen({ navigation }) {
           ))}
         </View>
 
-        {/* Subjects */}
-        <Text style={styles.sectionTitle}>Study by Subject</Text>
-        {SUBJECTS.map((subject) => (
-          <TouchableOpacity
-            key={subject.id}
-            style={styles.subjectRow}
-            onPress={() => navigation.navigate('Courses', { subject: subject.id })}
-            activeOpacity={0.8}
-          >
-            <View style={[styles.subjectIconWrap, { backgroundColor: subject.color + '20' }]}>
-              <Text style={styles.subjectIcon}>{subject.icon}</Text>
+        {/* Solve by Subject */}
+        {subjects.length > 0 && (
+          <>
+            <Text style={styles.sectionTitle}>Solve Problems by Subject</Text>
+            <View style={styles.subjectList}>
+              {subjects.map((subject) => {
+                const color = subject.color || colors.primary;
+                return (
+                  <TouchableOpacity
+                    key={subject.id}
+                    style={styles.subjectRow}
+                    activeOpacity={0.8}
+                    onPress={() => navigation.navigate('PracticeChapters', { subject })}
+                  >
+                    <View style={[styles.subjectIconWrap, { backgroundColor: color + '20' }]}>
+                      <Text style={styles.subjectIcon}>{subject.icon || '📚'}</Text>
+                    </View>
+                    <View style={styles.subjectInfo}>
+                      <Text style={styles.subjectName}>{subject.name}</Text>
+                      <Text style={styles.subjectDesc}>
+                        {subject.chapterCount ?? 0} chapters · {subject.questionCount ?? 0} questions
+                      </Text>
+                    </View>
+                    <View style={[styles.subjectArrow, { backgroundColor: color }]}>
+                      <Text style={styles.subjectArrowText}>→</Text>
+                    </View>
+                  </TouchableOpacity>
+                );
+              })}
             </View>
-            <View style={styles.subjectInfo}>
-              <Text style={styles.subjectTitle}>{subject.title}</Text>
-              <Text style={styles.subjectSub}>{subject.questions} Questions in Exam</Text>
-            </View>
-            <View style={[styles.subjectArrow, { backgroundColor: subject.color }]}>
-              <Text style={styles.subjectArrowText}>→</Text>
-            </View>
-          </TouchableOpacity>
-        ))}
+          </>
+        )}
 
         {/* Daily Challenge */}
         <TouchableOpacity
@@ -218,21 +231,25 @@ const styles = StyleSheet.create({
   liveBadgeText: { color: colors.white, fontSize: typography.sizes.xs, fontWeight: typography.weights.extrabold },
   bigFourTitle: { fontSize: typography.sizes.md, fontWeight: typography.weights.bold, color: colors.text },
   bigFourSub: { fontSize: typography.sizes.xs, color: colors.textSecondary, marginTop: 2 },
+  subjectList: { paddingHorizontal: spacing.md },
   subjectRow: {
-    flexDirection: 'row', alignItems: 'center',
-    backgroundColor: colors.white, marginHorizontal: spacing.md, marginBottom: spacing.sm,
-    borderRadius: radius.lg, padding: spacing.md, elevation: 2,
-    shadowColor: '#000', shadowOpacity: 0.05, shadowRadius: 4, shadowOffset: { width: 0, height: 2 },
+    flexDirection: 'row', alignItems: 'center', gap: spacing.md,
+    backgroundColor: colors.white, borderRadius: radius.lg,
+    padding: spacing.md, marginBottom: spacing.sm,
+    borderWidth: 1, borderColor: colors.border,
+    elevation: 2, shadowColor: '#000', shadowOpacity: 0.05, shadowRadius: 4, shadowOffset: { width: 0, height: 2 },
   },
   subjectIconWrap: {
-    width: 48, height: 48, borderRadius: 12, alignItems: 'center', justifyContent: 'center', marginRight: spacing.md,
+    width: 48, height: 48, borderRadius: 12,
+    alignItems: 'center', justifyContent: 'center', flexShrink: 0,
   },
   subjectIcon: { fontSize: 22 },
   subjectInfo: { flex: 1 },
-  subjectTitle: { fontSize: typography.sizes.md, fontWeight: typography.weights.bold, color: colors.text },
-  subjectSub: { fontSize: typography.sizes.xs, color: colors.textSecondary, marginTop: 2 },
+  subjectName: { fontSize: typography.sizes.md, fontWeight: typography.weights.bold, color: colors.text },
+  subjectDesc: { fontSize: typography.sizes.xs, color: colors.textSecondary, marginTop: 2 },
   subjectArrow: {
-    width: 32, height: 32, borderRadius: 16, alignItems: 'center', justifyContent: 'center',
+    width: 32, height: 32, borderRadius: 16,
+    alignItems: 'center', justifyContent: 'center', flexShrink: 0,
   },
   subjectArrowText: { color: colors.white, fontWeight: typography.weights.bold },
   challengeCard: {

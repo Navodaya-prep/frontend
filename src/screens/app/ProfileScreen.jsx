@@ -10,11 +10,8 @@ import { radius, spacing } from '../../theme/spacing';
 
 const MENU_ITEMS = [
   { icon: '📊', title: 'My Progress', subtitle: 'View your performance analytics', screen: 'Analytics' },
-  { icon: '🔖', title: 'Bookmarks', subtitle: 'Saved questions for revision', screen: 'Bookmarks' },
-  { icon: '🏆', title: 'My Achievements', subtitle: 'Badges and star points earned', screen: null },
-  { icon: '🔔', title: 'Notifications', subtitle: 'Class reminders and updates', screen: null },
-  { icon: '🔒', title: 'Privacy Policy', subtitle: 'Read our privacy policy', screen: null },
-  { icon: '📞', title: 'Help & Support', subtitle: 'Contact us for help', screen: null },
+  { icon: '🔒', title: 'Privacy Policy', subtitle: 'Read our privacy policy', screen: 'PrivacyPolicy' },
+  { icon: '📞', title: 'Help & Support', subtitle: 'Contact us for help', screen: 'Doubts', tab: true },
 ];
 
 export default function ProfileScreen({ navigation }) {
@@ -58,15 +55,7 @@ export default function ProfileScreen({ navigation }) {
           </View>
           <Text style={styles.userName}>{user?.name || 'Student'}</Text>
           <Text style={styles.userPhone}>+91 {user?.phone || '—'}</Text>
-          <View style={styles.userTags}>
-            <View style={styles.tag}>
-              <Text style={styles.tagText}>Class {user?.classLevel || '5'}</Text>
-            </View>
-            <View style={styles.tag}>
-              <Text style={styles.tagText}>{user?.state || 'India'}</Text>
-            </View>
-          </View>
-          <TouchableOpacity style={styles.editBtn} onPress={() => navigation.navigate('EditProfile')}>
+          <TouchableOpacity style={styles.editBtn} onPress={() => navigation.getParent()?.navigate('EditProfile')}>
             <Text style={styles.editBtnText}>Edit Profile</Text>
           </TouchableOpacity>
         </View>
@@ -85,23 +74,13 @@ export default function ProfileScreen({ navigation }) {
           ))}
         </View>
 
-        {/* Premium Banner */}
-        <TouchableOpacity style={styles.premiumBanner}>
-          <Text style={styles.premiumIcon}>⭐</Text>
-          <View style={{ flex: 1 }}>
-            <Text style={styles.premiumTitle}>Upgrade to Premium</Text>
-            <Text style={styles.premiumSub}>Unlock full syllabus & live doubt sessions</Text>
-          </View>
-          <Text style={styles.premiumArrow}>→</Text>
-        </TouchableOpacity>
-
         {/* Menu */}
         <View style={styles.menu}>
           {MENU_ITEMS.map((item) => (
             <TouchableOpacity
               key={item.title}
               style={[styles.menuItem, !item.screen && styles.menuItemDisabled]}
-              onPress={() => item.screen && navigation.navigate(item.screen)}
+              onPress={() => item.screen && (item.tab ? navigation.navigate(item.screen) : navigation.getParent()?.navigate(item.screen))}
               activeOpacity={item.screen ? 0.7 : 1}
             >
               <Text style={styles.menuIcon}>{item.icon}</Text>
@@ -149,20 +128,13 @@ const styles = StyleSheet.create({
   editBtnText: { color: colors.white, fontWeight: typography.weights.semibold, fontSize: typography.sizes.sm },
   statsRow: {
     flexDirection: 'row', backgroundColor: colors.white,
-    marginHorizontal: spacing.md, marginTop: -1, borderRadius: radius.xl,
+    marginHorizontal: spacing.md, marginTop: -spacing.lg, marginBottom: spacing.md,
+    borderRadius: radius.xl,
     elevation: 4, shadowColor: '#000', shadowOpacity: 0.1, shadowRadius: 8, shadowOffset: { width: 0, height: 4 },
   },
   statItem: { flex: 1, alignItems: 'center', paddingVertical: spacing.md },
   statVal: { fontSize: typography.sizes.xl, fontWeight: typography.weights.extrabold, color: colors.primary },
   statLabel: { fontSize: typography.sizes.xs, color: colors.textSecondary, marginTop: 2 },
-  premiumBanner: {
-    flexDirection: 'row', alignItems: 'center',
-    backgroundColor: colors.accent, margin: spacing.md, borderRadius: radius.lg, padding: spacing.md,
-  },
-  premiumIcon: { fontSize: 28, marginRight: spacing.md },
-  premiumTitle: { color: colors.white, fontWeight: typography.weights.bold, fontSize: typography.sizes.md },
-  premiumSub: { color: 'rgba(255,255,255,0.85)', fontSize: typography.sizes.xs, marginTop: 2 },
-  premiumArrow: { color: colors.white, fontWeight: typography.weights.bold, fontSize: typography.sizes.xl },
   menu: { backgroundColor: colors.white, marginHorizontal: spacing.md, borderRadius: radius.xl, overflow: 'hidden' },
   menuItem: {
     flexDirection: 'row', alignItems: 'center', paddingHorizontal: spacing.md, paddingVertical: spacing.md,

@@ -11,22 +11,12 @@ import { colors } from '../../theme/colors';
 import { typography } from '../../theme/typography';
 import { radius, spacing } from '../../theme/spacing';
 
-const STATES = [
-  'Andhra Pradesh', 'Assam', 'Bihar', 'Chhattisgarh', 'Goa', 'Gujarat',
-  'Haryana', 'Himachal Pradesh', 'Jharkhand', 'Karnataka', 'Kerala',
-  'Madhya Pradesh', 'Maharashtra', 'Manipur', 'Meghalaya', 'Mizoram',
-  'Nagaland', 'Odisha', 'Punjab', 'Rajasthan', 'Sikkim', 'Tamil Nadu',
-  'Telangana', 'Tripura', 'Uttar Pradesh', 'Uttarakhand', 'West Bengal',
-];
-
 export default function EditProfileScreen({ navigation }) {
   const dispatch = useDispatch();
   const { user } = useSelector((s) => s.auth);
 
   const [name, setName] = useState(user?.name || '');
-  const [state, setState] = useState(user?.state || '');
   const [saving, setSaving] = useState(false);
-  const [showStatePicker, setShowStatePicker] = useState(false);
 
   const handleSave = async () => {
     if (!name.trim()) {
@@ -35,7 +25,7 @@ export default function EditProfileScreen({ navigation }) {
     }
     setSaving(true);
     try {
-      await profileApi.updateProfile({ name: name.trim(), state });
+      await profileApi.updateProfile({ name: name.trim(), classLevel: '5' });
       await dispatch(fetchProfile());
       Alert.alert('Saved', 'Profile updated successfully', [
         { text: 'OK', onPress: () => navigation.goBack() },
@@ -77,35 +67,6 @@ export default function EditProfileScreen({ navigation }) {
           <Text style={styles.hint}>Phone number cannot be changed</Text>
         </View>
 
-        <View style={styles.field}>
-          <Text style={styles.label}>Class Level</Text>
-          <View style={styles.inputDisabled}>
-            <Text style={styles.inputDisabledText}>Class {user?.classLevel}</Text>
-          </View>
-        </View>
-
-        <View style={styles.field}>
-          <Text style={styles.label}>State</Text>
-          <TouchableOpacity style={styles.input} onPress={() => setShowStatePicker(!showStatePicker)}>
-            <Text style={[styles.inputText, !state && { color: colors.textLight }]}>
-              {state || 'Select your state'}
-            </Text>
-          </TouchableOpacity>
-          {showStatePicker && (
-            <ScrollView style={styles.statePicker} nestedScrollEnabled>
-              {STATES.map((s) => (
-                <TouchableOpacity
-                  key={s}
-                  style={[styles.stateOption, state === s && styles.stateOptionSelected]}
-                  onPress={() => { setState(s); setShowStatePicker(false); }}
-                >
-                  <Text style={[styles.stateOptionText, state === s && styles.stateOptionTextSelected]}>{s}</Text>
-                </TouchableOpacity>
-              ))}
-            </ScrollView>
-          )}
-        </View>
-
         <TouchableOpacity
           style={[styles.saveBtn, saving && styles.saveBtnDisabled]}
           onPress={handleSave}
@@ -137,21 +98,12 @@ const styles = StyleSheet.create({
     borderColor: colors.border, paddingHorizontal: spacing.md, paddingVertical: 14,
     fontSize: typography.sizes.md, color: colors.text,
   },
-  inputText: { fontSize: typography.sizes.md, color: colors.text },
   inputDisabled: {
     backgroundColor: colors.background, borderRadius: radius.md, borderWidth: 1.5,
     borderColor: colors.border, paddingHorizontal: spacing.md, paddingVertical: 14,
   },
   inputDisabledText: { fontSize: typography.sizes.md, color: colors.textSecondary },
   hint: { fontSize: typography.sizes.xs, color: colors.textLight },
-  statePicker: {
-    backgroundColor: colors.white, borderRadius: radius.md, borderWidth: 1.5,
-    borderColor: colors.border, maxHeight: 200, marginTop: 4,
-  },
-  stateOption: { paddingHorizontal: spacing.md, paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: colors.border },
-  stateOptionSelected: { backgroundColor: colors.primaryLight },
-  stateOptionText: { fontSize: typography.sizes.md, color: colors.text },
-  stateOptionTextSelected: { color: colors.primary, fontWeight: typography.weights.semibold },
   saveBtn: {
     backgroundColor: colors.primary, borderRadius: radius.lg,
     paddingVertical: 14, alignItems: 'center', marginTop: spacing.md,

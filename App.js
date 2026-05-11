@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { Platform } from 'react-native';
 import { Provider } from 'react-redux';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 import * as Notifications from 'expo-notifications';
 import { store } from './src/store';
 import RootNavigator from './src/navigation/RootNavigator';
@@ -43,8 +44,10 @@ export default function App() {
   }, []);
 
   return (
-    <Provider store={store}>
-      <RootNavigator />
-    </Provider>
+    <SafeAreaProvider>
+      <Provider store={store}>
+        <RootNavigator />
+      </Provider>
+    </SafeAreaProvider>
   );
 }

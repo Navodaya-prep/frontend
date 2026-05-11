@@ -89,7 +89,7 @@ export default function LandingScreen({ navigation }) {
           <TouchableOpacity style={styles.ctaBtn} onPress={() => navigation.navigate('Login')}>
             <Text style={styles.ctaBtnText}>Get Started →</Text>
           </TouchableOpacity>
-          <Text style={styles.ctaNote}>✓ No credit card required · ✓ Free forever plan available</Text>
+          <Text style={styles.ctaNote}>✓ No credit card required · ✓ 100% Free for all students</Text>
 
           {/* Stats */}
           <View style={styles.statsRow}>
@@ -152,7 +152,7 @@ export default function LandingScreen({ navigation }) {
           <Text style={styles.sectionSubtitle}>Your path to success in 4 simple steps</Text>
           {[
             { step: '1', icon: '📱', title: 'Download & Sign Up', desc: 'Create your free account in 30 seconds' },
-            { step: '2', icon: '📚', title: 'Choose Your Plan', desc: 'Select subjects and start learning' },
+            { step: '2', icon: '📚', title: 'Start Learning', desc: 'Select subjects and start learning' },
             { step: '3', icon: '🎯', title: 'Practice Daily', desc: 'Solve questions, watch videos, take tests' },
             { step: '4', icon: '🏆', title: 'Track & Improve', desc: 'Monitor progress and ace the exam' },
           ].map((item) => (
@@ -202,7 +202,7 @@ export default function LandingScreen({ navigation }) {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Why Students Choose Us</Text>
           {[
-            { icon: '💰', title: 'Affordable for Everyone', desc: 'Free plan available. Premium starts at just ₹99/month' },
+            { icon: '🎁', title: 'Completely Free', desc: 'All features unlocked for every student, no hidden charges' },
             { icon: '🌍', title: 'Learn Anywhere', desc: 'Works on 2G/3G/4G. Download content for offline access' },
             { icon: '📞', title: '24/7 Support', desc: 'WhatsApp support & live doubt resolution every day' },
             { icon: '🎓', title: 'Expert Teachers', desc: 'Learn from IIT, IIM & top university educators' },

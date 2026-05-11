@@ -4,56 +4,45 @@ import {
   StatusBar, Dimensions,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { WebView } from 'react-native-webview';
 import { useSelector } from 'react-redux';
 import ChatBox from '../../components/live/ChatBox';
 import QuizPopup from '../../components/live/QuizPopup';
 import { colors } from '../../theme/colors';
 import { typography } from '../../theme/typography';
 import { spacing, radius } from '../../theme/spacing';
-
 import { WS_BASE_URL } from '../../config';
-const WS_BASE = WS_BASE_URL;
+
 const { height } = Dimensions.get('window');
 
 export default function LiveClassScreen({ route, navigation }) {
   const { classData } = route.params;
   const { user, token } = useSelector((s) => s.auth);
 
+  const wsRef = useRef(null);
   const [messages, setMessages] = useState([]);
   const [connected, setConnected] = useState(false);
   const [activeQuiz, setActiveQuiz] = useState(null);
-  const [leaderboardEntry, setLeaderboardEntry] = useState(null); // user's result after quiz
-  const wsRef = useRef(null);
+  const [leaderboardEntry, setLeaderboardEntry] = useState(null);
 
   const connect = useCallback(() => {
     const name = encodeURIComponent(user?.name || 'Student');
-    const url = `${WS_BASE}/ws/live/${classData.id}?token=${token}&name=${name}`;
+    const url = `${WS_BASE_URL}/ws/live/${classData.id}?token=${token}&name=${name}`;
     const socket = new WebSocket(url);
 
     socket.onopen = () => setConnected(true);
-
     socket.onclose = () => {
       setConnected(false);
-      // Auto-reconnect after 3s
       setTimeout(connect, 3000);
     };
-
     socket.onmessage = (e) => {
-      try {
-        const msg = JSON.parse(e.data);
-        handleEvent(msg);
-      } catch {}
+      try { handleEvent(JSON.parse(e.data)); } catch {}
     };
-
     wsRef.current = socket;
   }, [classData.id, token, user]);
 
   useEffect(() => {
     connect();
-    return () => {
-      wsRef.current?.close();
-    };
+    return () => wsRef.current?.close();
   }, [connect]);
 
   function handleEvent(msg) {
@@ -67,11 +56,11 @@ export default function LiveClassScreen({ route, navigation }) {
         break;
       case 'quiz_end': {
         setActiveQuiz(null);
-        // Find user's rank in leaderboard
         const entry = msg.payload.leaderboard?.find((e) => e.userId === user?.id);
-        if (entry) setLeaderboardEntry(entry);
-        // Clear result after 5s
-        setTimeout(() => setLeaderboardEntry(null), 5000);
+        if (entry) {
+          setLeaderboardEntry(entry);
+          setTimeout(() => setLeaderboardEntry(null), 5000);
+        }
         break;
       }
       case 'class_end':
@@ -94,11 +83,9 @@ export default function LiveClassScreen({ route, navigation }) {
     setActiveQuiz(null);
   }
 
-  const youtubeUri = `https://www.youtube.com/watch?v=${classData.youtubeVideoId}`;
-
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
-      <StatusBar barStyle="dark-content" />
+      <StatusBar barStyle="light-content" backgroundColor={colors.primary} />
 
       {/* Header */}
       <View style={styles.header}>
@@ -109,28 +96,23 @@ export default function LiveClassScreen({ route, navigation }) {
           <Text style={styles.classTitle} numberOfLines={1}>{classData.title}</Text>
           <Text style={styles.classMeta}>{classData.subject} · {classData.teacherName}</Text>
         </View>
-        <View style={[styles.statusDot, { backgroundColor: connected ? colors.success : colors.error }]} />
+        <View style={styles.statusRow}>
+          <View style={[styles.statusDot, { backgroundColor: connected ? colors.success : colors.error }]} />
+          <Text style={styles.statusText}>{connected ? 'Live' : 'Connecting'}</Text>
+        </View>
       </View>
 
-      {/* YouTube Player */}
-      <View style={styles.player}>
-        <WebView
-          source={{ uri: youtubeUri }}
-          style={{ flex: 1 }}
-          allowsInlineMediaPlayback
-          mediaPlaybackRequiresUserAction={false}
-          javaScriptEnabled
-          userAgent="Mozilla/5.0 (Linux; Android 10; Mobile) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36"
-        />
+      {/* Video placeholder */}
+      <View style={styles.videoContainer}>
+        <View style={styles.videoPlaceholder}>
+          <Text style={styles.videoIcon}>🎥</Text>
+          <Text style={styles.videoPlaceholderText}>Live video coming soon</Text>
+        </View>
       </View>
 
       {/* Chat */}
       <View style={styles.chatContainer}>
-        <ChatBox
-          messages={messages}
-          onSend={sendChat}
-          currentUserId={user?.id}
-        />
+        <ChatBox messages={messages} onSend={sendChat} currentUserId={user?.id} />
       </View>
 
       {/* Quiz Popup */}
@@ -159,30 +141,30 @@ export default function LiveClassScreen({ route, navigation }) {
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: colors.background },
   header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.sm,
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
-    backgroundColor: colors.white,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border,
+    flexDirection: 'row', alignItems: 'center', gap: spacing.sm,
+    paddingHorizontal: spacing.md, paddingVertical: spacing.sm,
+    backgroundColor: colors.primary,
   },
   backBtn: { padding: spacing.xs },
-  backText: { fontSize: 22, color: colors.primary },
-  classTitle: { fontSize: typography.sizes.md, fontWeight: typography.weights.bold, color: colors.text },
-  classMeta: { fontSize: typography.sizes.xs, color: colors.textLight },
-  statusDot: { width: 10, height: 10, borderRadius: 5 },
-  player: { height: height * 0.28 },
+  backText: { fontSize: 22, color: colors.white },
+  classTitle: { fontSize: typography.sizes.md, fontWeight: typography.weights.bold, color: colors.white },
+  classMeta: { fontSize: typography.sizes.xs, color: '#B8D4FF' },
+  statusRow: { flexDirection: 'row', alignItems: 'center', gap: 4 },
+  statusDot: { width: 8, height: 8, borderRadius: 4 },
+  statusText: { fontSize: typography.sizes.xs, color: colors.white, fontWeight: typography.weights.semibold },
+  videoContainer: { height: height * 0.3, backgroundColor: '#000' },
+  videoPlaceholder: {
+    flex: 1, alignItems: 'center', justifyContent: 'center',
+    backgroundColor: '#111', gap: spacing.sm,
+  },
+  videoIcon: { fontSize: 36 },
+  videoPlaceholderText: { color: '#aaa', fontSize: typography.sizes.sm },
   chatContainer: { flex: 1, borderTopWidth: 1, borderTopColor: colors.border },
   resultBanner: {
-    position: 'absolute',
-    bottom: 80,
-    left: spacing.md,
-    right: spacing.md,
-    padding: spacing.md,
-    borderRadius: radius.md,
-    alignItems: 'center',
+    position: 'absolute', bottom: 80,
+    left: spacing.md, right: spacing.md,
+    padding: spacing.md, borderRadius: radius.md, alignItems: 'center',
+    elevation: 6,
   },
   resultText: { color: '#fff', fontWeight: typography.weights.bold, fontSize: typography.sizes.md },
 });

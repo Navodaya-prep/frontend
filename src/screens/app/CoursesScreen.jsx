@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, FlatList, TouchableOpacity, StyleSheet, RefreshControl } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchCourses } from '../../store/courseSlice';
@@ -8,65 +8,54 @@ import { typography } from '../../theme/typography';
 import { radius, spacing } from '../../theme/spacing';
 import { AppLoader } from '../../components/common/AppLoader';
 
-const SUBJECT_FILTERS = [
-  { label: 'All', value: 'all' },
-  { label: '🧠 Mental Ability', value: 'mental_ability' },
-  { label: '➕ Arithmetic', value: 'arithmetic' },
-  { label: '📝 Language', value: 'language' },
-];
-
-// Sample data for UI when API isn't connected
-const SAMPLE_COURSES = [
-  { _id: '1', title: 'Mental Ability Masterclass', subject: 'mental_ability', thumbnail: '🧠', chaptersCount: 12, videosCount: 48, isPremium: false },
-  { _id: '2', title: 'Arithmetic for JNVST', subject: 'arithmetic', thumbnail: '➕', chaptersCount: 8, videosCount: 32, isPremium: false },
-  { _id: '3', title: 'Language & Comprehension', subject: 'language', thumbnail: '📝', chaptersCount: 6, videosCount: 24, isPremium: true },
-  { _id: '4', title: 'Previous Year Papers', subject: 'mental_ability', thumbnail: '📚', chaptersCount: 10, videosCount: 0, isPremium: true },
-];
-
 export default function CoursesScreen({ navigation }) {
   const dispatch = useDispatch();
   const { list, status } = useSelector((s) => s.courses);
-  const [filter, setFilter] = useState('all');
+  const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => { dispatch(fetchCourses()); }, []);
 
-  const courses = list.filter(
-    (c) => filter === 'all' || c.subject === filter
-  );
+  async function handleRefresh() {
+    setRefreshing(true);
+    await dispatch(fetchCourses(true));
+    setRefreshing(false);
+  }
 
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>My Courses</Text>
-      </View>
-
-      {/* Filter Tabs */}
-      <View style={styles.filtersWrap}>
-        <FlatList
-          data={SUBJECT_FILTERS}
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          keyExtractor={(item) => item.value}
-          contentContainerStyle={styles.filtersList}
-          renderItem={({ item }) => (
-            <TouchableOpacity
-              style={[styles.filterTab, filter === item.value && styles.filterTabActive]}
-              onPress={() => setFilter(item.value)}
-            >
-              <Text style={[styles.filterTabText, filter === item.value && styles.filterTabTextActive]}>
-                {item.label}
-              </Text>
-            </TouchableOpacity>
-          )}
-        />
+        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
+          <Text style={styles.backText}>←</Text>
+        </TouchableOpacity>
+        <View>
+          <Text style={styles.headerTitle}>Recorded Classes</Text>
+          <Text style={styles.headerSub}>Select a course to start</Text>
+        </View>
       </View>
 
       {status === 'loading' && list.length === 0
         ? <AppLoader />
         : <FlatList
-            data={courses}
+            data={list}
             keyExtractor={(item) => item.id || item._id}
             contentContainerStyle={styles.list}
+            refreshControl={
+              <RefreshControl
+                refreshing={refreshing}
+                onRefresh={handleRefresh}
+                colors={[colors.primary]}
+                tintColor={colors.primary}
+              />
+            }
+            ListEmptyComponent={
+              status !== 'loading' && (
+                <View style={styles.empty}>
+                  <Text style={styles.emptyIcon}>📚</Text>
+                  <Text style={styles.emptyTitle}>No Courses Available</Text>
+                  <Text style={styles.emptySub}>Pull down to refresh or check back later</Text>
+                </View>
+              )
+            }
             renderItem={({ item }) => (
               <TouchableOpacity
                 style={styles.courseCard}
@@ -110,19 +99,14 @@ function getSubjectColor(subject) {
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: colors.background },
   header: {
-    backgroundColor: colors.primary, paddingHorizontal: spacing.md, paddingVertical: spacing.md,
+    flexDirection: 'row', alignItems: 'center', gap: spacing.md,
+    backgroundColor: colors.white, paddingHorizontal: spacing.md,
+    paddingVertical: spacing.md, borderBottomWidth: 1, borderBottomColor: colors.border,
   },
-  headerTitle: { fontSize: typography.sizes.xl, fontWeight: typography.weights.extrabold, color: colors.white },
-  filtersWrap: { backgroundColor: colors.white, borderBottomWidth: 1, borderBottomColor: colors.border },
-  filtersList: { paddingHorizontal: spacing.md, paddingVertical: spacing.sm },
-  filterTab: {
-    paddingHorizontal: spacing.md, paddingVertical: spacing.xs,
-    borderRadius: radius.full, marginRight: spacing.sm,
-    backgroundColor: colors.background,
-  },
-  filterTabActive: { backgroundColor: colors.primary },
-  filterTabText: { fontSize: typography.sizes.sm, color: colors.textSecondary, fontWeight: typography.weights.medium },
-  filterTabTextActive: { color: colors.white, fontWeight: typography.weights.bold },
+  backBtn: { padding: spacing.xs },
+  backText: { fontSize: 22, color: colors.primary },
+  headerTitle: { fontSize: typography.sizes.xl, fontWeight: typography.weights.extrabold, color: colors.text },
+  headerSub: { fontSize: typography.sizes.xs, color: colors.textLight, marginTop: 2 },
   list: { padding: spacing.md },
   courseCard: {
     flexDirection: 'row', backgroundColor: colors.white, borderRadius: radius.lg,
@@ -144,4 +128,8 @@ const styles = StyleSheet.create({
   courseMeta: { fontSize: typography.sizes.xs, color: colors.textSecondary, marginTop: 4, marginBottom: spacing.xs },
   subjectTag: { alignSelf: 'flex-start', borderRadius: radius.full, paddingHorizontal: spacing.sm, paddingVertical: 2 },
   subjectTagText: { fontSize: typography.sizes.xs, fontWeight: typography.weights.bold },
+  empty: { alignItems: 'center', paddingTop: 60, paddingHorizontal: spacing.xl },
+  emptyIcon: { fontSize: 52, marginBottom: spacing.md },
+  emptyTitle: { fontSize: typography.sizes.md, fontWeight: typography.weights.bold, color: colors.text },
+  emptySub: { fontSize: typography.sizes.sm, color: colors.textLight, textAlign: 'center', marginTop: 4 },
 });

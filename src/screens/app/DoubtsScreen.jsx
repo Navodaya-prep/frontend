@@ -15,14 +15,22 @@ import { colors } from '../../theme/colors';
 import { typography } from '../../theme/typography';
 import { radius, spacing } from '../../theme/spacing';
 
-const SUBJECTS = ['General', 'Mental Ability', 'Arithmetic', 'Language'];
+const SUBJECTS = ['General', 'Support', 'Subject'];
+
+const FAQS = [
+  { q: 'When is the JNVST exam held?', a: 'JNVST for Class 6 is typically held in November every year. For Class 9, it is held in February. Admit cards are released 2–3 weeks before the exam.' },
+  { q: 'What subjects are covered?', a: 'All three JNVST subjects are covered: Mental Ability (40 questions), Arithmetic (20 questions), and Language — Hindi/English (20 questions).' },
+  { q: 'How is the mock test structured?', a: 'Our mock tests mirror the actual JNVST format: 80 questions, 2 hours, with a digital OMR sheet interface to help you practice filling circles.' },
+  { q: 'Does the app work offline?', a: 'Practice questions and downloaded content are accessible offline. Video streaming requires an internet connection, though we optimise for low-bandwidth usage.' },
+  { q: 'How do I delete my doubt?', a: 'Long-press on any doubt you posted to get the option to delete it.' },
+  { q: 'Who answers my doubts?', a: 'Our expert teachers and admins review and answer doubts regularly. Other students can also reply to help each other.' },
+];
 
 function getSubjectColor(subject) {
   const map = {
-    'Mental Ability': colors.primary,
-    Arithmetic: colors.accent,
-    Language: colors.success,
     General: colors.textSecondary,
+    Support: colors.accent,
+    Subject: colors.primary,
   };
   return map[subject] || colors.primary;
 }
@@ -45,6 +53,8 @@ export default function DoubtsScreen() {
 
   const [question, setQuestion] = useState('');
   const [subject, setSubject] = useState('General');
+  const [faqOpen, setFaqOpen] = useState(false);
+  const [openFaqIndex, setOpenFaqIndex] = useState(null);
   const [answerModal, setAnswerModal] = useState(false);
   const [answerText, setAnswerText] = useState('');
   const [activeDoubtId, setActiveDoubtId] = useState(null);
@@ -113,6 +123,7 @@ export default function DoubtsScreen() {
             />
           }
           ListHeaderComponent={
+            <>
             <View style={styles.askCard}>
               <Text style={styles.askTitle}>Ask Your Doubt</Text>
 
@@ -148,6 +159,42 @@ export default function DoubtsScreen() {
                 </Text>
               </TouchableOpacity>
             </View>
+
+            {/* FAQ Section */}
+            <View style={styles.faqCard}>
+              <TouchableOpacity style={styles.faqToggle} onPress={() => { setFaqOpen(!faqOpen); setOpenFaqIndex(null); }} activeOpacity={0.8}>
+                <View style={styles.faqToggleLeft}>
+                  <Text style={styles.faqToggleIcon}>💡</Text>
+                  <View>
+                    <Text style={styles.faqToggleTitle}>Quick Answers</Text>
+                    <Text style={styles.faqToggleSub}>Common questions answered</Text>
+                  </View>
+                </View>
+                <Text style={styles.faqChevron}>{faqOpen ? '▲' : '▼'}</Text>
+              </TouchableOpacity>
+
+              {faqOpen && (
+                <View style={styles.faqList}>
+                  {FAQS.map((faq, i) => (
+                    <TouchableOpacity
+                      key={i}
+                      style={[styles.faqItem, i === FAQS.length - 1 && { borderBottomWidth: 0 }]}
+                      onPress={() => setOpenFaqIndex(openFaqIndex === i ? null : i)}
+                      activeOpacity={0.8}
+                    >
+                      <View style={styles.faqItemHeader}>
+                        <Text style={styles.faqQ} numberOfLines={openFaqIndex === i ? undefined : 2}>{faq.q}</Text>
+                        <Text style={styles.faqItemIcon}>{openFaqIndex === i ? '−' : '+'}</Text>
+                      </View>
+                      {openFaqIndex === i && (
+                        <Text style={styles.faqA}>{faq.a}</Text>
+                      )}
+                    </TouchableOpacity>
+                  ))}
+                </View>
+              )}
+            </View>
+            </>
           }
           ListEmptyComponent={
             status !== 'loading' && (
@@ -277,6 +324,29 @@ const styles = StyleSheet.create({
   askBtn: { backgroundColor: colors.primary, borderRadius: radius.md, paddingVertical: 12, alignItems: 'center' },
   askBtnDisabled: { opacity: 0.5 },
   askBtnText: { color: colors.white, fontWeight: typography.weights.bold, fontSize: typography.sizes.md },
+  faqCard: {
+    backgroundColor: colors.white, borderRadius: radius.xl, marginBottom: spacing.md,
+    elevation: 2, shadowColor: '#000', shadowOpacity: 0.06, shadowRadius: 6, shadowOffset: { width: 0, height: 2 },
+    overflow: 'hidden',
+  },
+  faqToggle: {
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
+    padding: spacing.md,
+  },
+  faqToggleLeft: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
+  faqToggleIcon: { fontSize: 22 },
+  faqToggleTitle: { fontSize: typography.sizes.md, fontWeight: typography.weights.bold, color: colors.text },
+  faqToggleSub: { fontSize: typography.sizes.xs, color: colors.textSecondary, marginTop: 1 },
+  faqChevron: { fontSize: typography.sizes.xs, color: colors.textSecondary, fontWeight: typography.weights.bold },
+  faqList: { borderTopWidth: 1, borderTopColor: colors.border },
+  faqItem: {
+    paddingHorizontal: spacing.md, paddingVertical: spacing.sm,
+    borderBottomWidth: 1, borderBottomColor: colors.border,
+  },
+  faqItemHeader: { flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'space-between', gap: spacing.sm },
+  faqQ: { flex: 1, fontSize: typography.sizes.sm, fontWeight: typography.weights.semibold, color: colors.text, lineHeight: 20 },
+  faqItemIcon: { fontSize: typography.sizes.lg, color: colors.primary, fontWeight: typography.weights.bold, lineHeight: 20 },
+  faqA: { fontSize: typography.sizes.sm, color: colors.textSecondary, lineHeight: 20, marginTop: spacing.xs },
   doubtCard: {
     backgroundColor: colors.white, borderRadius: radius.lg, padding: spacing.md, marginBottom: spacing.sm,
     elevation: 1, shadowColor: '#000', shadowOpacity: 0.04, shadowRadius: 4, shadowOffset: { width: 0, height: 1 },
