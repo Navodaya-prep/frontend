@@ -39,7 +39,7 @@ export default function MockTestStartScreen({ navigation, route }) {
   if (status === 'loading') return <AppLoader fullScreen />;
 
   return (
-    <SafeAreaView style={styles.safe}>
+    <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
           <Text style={styles.back}>← Back</Text>

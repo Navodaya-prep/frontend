@@ -3,8 +3,9 @@ import { View, Text, TouchableOpacity, StyleSheet, Image } from 'react-native';
 import { colors } from '../../theme/colors';
 import { typography } from '../../theme/typography';
 import { radius, spacing } from '../../theme/spacing';
+import { API_BASE_URL } from '../../config';
 
-const API_BASE = 'http://localhost:8080';
+const API_BASE = API_BASE_URL.replace('/api', '');
 const OPTION_LABELS = ['A', 'B', 'C', 'D'];
 
 function getFullImageUrl(url) {

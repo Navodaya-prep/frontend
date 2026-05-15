@@ -84,7 +84,7 @@ export default function LiveClassScreen({ route, navigation }) {
   }
 
   return (
-    <SafeAreaView style={styles.safe} edges={['top']}>
+    <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
       <StatusBar barStyle="light-content" backgroundColor={colors.primary} />
 
       {/* Header */}

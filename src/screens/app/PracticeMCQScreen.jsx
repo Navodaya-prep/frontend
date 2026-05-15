@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import {
-  View, Text, TouchableOpacity, StyleSheet, Alert,
-  SafeAreaView, ScrollView,
+  View, Text, TouchableOpacity, StyleSheet, Alert, ScrollView,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   selectAnswer, clearSession, submitChapterPractice,
@@ -104,7 +104,7 @@ export default function PracticeMCQScreen({ navigation, route }) {
   // ─────────────────────────────────────────────────────────────────────────
   if (submitted && isNewFlow && result) {
     return (
-      <SafeAreaView style={styles.safe}>
+      <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
         <View style={styles.header}>
           <TouchableOpacity onPress={() => navigation.goBack()} style={styles.exitWrap}>
             <Text style={styles.exitBtn}>✕</Text>
@@ -177,7 +177,7 @@ export default function PracticeMCQScreen({ navigation, route }) {
     : legacyAnswers[currentIndex];
 
   return (
-    <SafeAreaView style={styles.safe}>
+    <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => {

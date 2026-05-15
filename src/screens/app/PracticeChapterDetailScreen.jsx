@@ -3,7 +3,7 @@ import {
   View, Text, FlatList, TouchableOpacity,
   StyleSheet, RefreshControl,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchChapterQuestions, clearQuestions } from '../../store/practiceHubSlice';
 import { AppLoader } from '../../components/common/AppLoader';
@@ -29,6 +29,7 @@ function DiffBadge({ difficulty }) {
 export default function PracticeChapterDetailScreen({ route, navigation }) {
   const { chapter, subject } = route.params;
   const dispatch = useDispatch();
+  const insets = useSafeAreaInsets();
   const { questions, solvedIds, loading, error } = useSelector((s) => s.practiceHub);
   const [activeTab, setActiveTab] = useState('open'); // 'open' | 'solved' | 'pyq'
 
@@ -71,7 +72,7 @@ export default function PracticeChapterDetailScreen({ route, navigation }) {
   }
 
   return (
-    <SafeAreaView style={styles.safe} edges={['top']}>
+    <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
@@ -132,7 +133,7 @@ export default function PracticeChapterDetailScreen({ route, navigation }) {
         data={displayedQuestions}
         keyExtractor={(item) => item.id}
         renderItem={renderQuestion}
-        contentContainerStyle={styles.list}
+        contentContainerStyle={[styles.list, { paddingBottom: 100 + insets.bottom }]}
         refreshControl={
           <RefreshControl
             refreshing={loading}
@@ -165,7 +166,7 @@ export default function PracticeChapterDetailScreen({ route, navigation }) {
 
       {/* Practice CTA */}
       {displayedQuestions.length > 0 && (
-        <View style={styles.ctaWrap}>
+        <View style={[styles.ctaWrap, { paddingBottom: spacing.md + insets.bottom }]}>
           <TouchableOpacity
             style={[styles.ctaBtn, displayedQuestions.length === 0 && styles.ctaBtnDisabled]}
             onPress={() => startPractice(displayedQuestions)}
@@ -215,7 +216,7 @@ const styles = StyleSheet.create({
   tabActive: { borderBottomColor: colors.primary },
   tabText: { fontSize: typography.sizes.sm, fontWeight: typography.weights.semibold, color: colors.textSecondary },
   tabTextActive: { color: colors.primary },
-  list: { padding: spacing.md, gap: spacing.sm, paddingBottom: 100 },
+  list: { padding: spacing.md, gap: spacing.sm },
   questionRow: {
     flexDirection: 'row', alignItems: 'center', gap: spacing.sm,
     backgroundColor: colors.white, borderRadius: radius.md,
@@ -238,7 +239,8 @@ const styles = StyleSheet.create({
   emptySub: { fontSize: typography.sizes.sm, color: colors.textLight, textAlign: 'center', marginTop: 4, lineHeight: 20 },
   ctaWrap: {
     position: 'absolute', bottom: 0, left: 0, right: 0,
-    padding: spacing.md, backgroundColor: colors.white,
+    paddingTop: spacing.md, paddingHorizontal: spacing.md,
+    backgroundColor: colors.white,
     borderTopWidth: 1, borderTopColor: colors.border,
   },
   ctaBtn: {

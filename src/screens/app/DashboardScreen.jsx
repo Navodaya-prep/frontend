@@ -67,28 +67,26 @@ export default function DashboardScreen({ navigation }) {
         showsVerticalScrollIndicator={false}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={[colors.primary]} />}
       >
-        {/* Top Bar */}
-        <View style={styles.topBar}>
-          <View>
-            <Text style={styles.greeting}>Hello, {user?.name?.split(' ')[0] || 'Student'}! 👋</Text>
-            <Text style={styles.greetingSub}>Ready to crack JNVST?</Text>
-          </View>
-          <View style={styles.streakBadge}>
-            <Text style={styles.streakFire}>🔥</Text>
-            <Text style={styles.streakNum}>{user?.streak || 0}</Text>
-            <Text style={styles.streakLabel}>day streak</Text>
-          </View>
-        </View>
-
-        {/* Exam Countdown */}
-        <View style={styles.countdownBanner}>
-          <View>
-            <Text style={styles.countdownTitle}>{examName || 'JNVST 2026'}</Text>
-            <Text style={styles.countdownSub}>Stay consistent · Stay ahead</Text>
-          </View>
-          <View style={styles.countdownBadge}>
-            <Text style={styles.countdownDays}>{daysLeft !== null ? daysLeft : '—'}</Text>
-            <Text style={styles.countdownDaysLabel}>days left</Text>
+        {/* Hero Banner — greeting, streak & exam countdown */}
+        <View style={styles.heroBanner}>
+          <Text style={styles.heroGreeting}>Hello, {user?.name?.split(' ')[0] || 'Student'}! 👋</Text>
+          <Text style={styles.heroGreetingSub}>Ready to crack JNVST?</Text>
+          <View style={styles.heroBadgesRow}>
+            <View style={styles.heroStreakBadge}>
+              <Text style={styles.heroBadgeIcon}>🔥</Text>
+              <View>
+                <Text style={styles.heroBadgeNum}>{user?.streak || 0}</Text>
+                <Text style={styles.heroBadgeLabel}>day streak</Text>
+              </View>
+            </View>
+            <View style={styles.heroCountdownBadge}>
+              <Text style={styles.heroBadgeIcon}>📅</Text>
+              <View>
+                <Text style={styles.heroBadgeNum}>{daysLeft !== null ? daysLeft : '—'}</Text>
+                <Text style={styles.heroBadgeLabel}>days left</Text>
+                <Text style={styles.heroBadgeExamName}>{examName || 'JNVST 2026'}</Text>
+              </View>
+            </View>
           </View>
         </View>
 
@@ -184,29 +182,27 @@ export default function DashboardScreen({ navigation }) {
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: colors.background },
   scroll: { flex: 1 },
-  topBar: {
-    flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
-    backgroundColor: colors.primary, paddingHorizontal: spacing.md, paddingVertical: spacing.md,
+  heroBanner: {
+    backgroundColor: colors.primary,
+    paddingHorizontal: spacing.md,
+    paddingTop: spacing.md,
+    paddingBottom: spacing.md,
   },
-  greeting: { fontSize: typography.sizes.xl, fontWeight: typography.weights.extrabold, color: colors.white },
-  greetingSub: { fontSize: typography.sizes.sm, color: '#B8D4FF', marginTop: 2 },
-  streakBadge: {
-    backgroundColor: colors.primaryDark, borderRadius: radius.md,
-    padding: spacing.sm, alignItems: 'center', minWidth: 70,
+  heroGreeting: { fontSize: typography.sizes.xl, fontWeight: typography.weights.extrabold, color: colors.white },
+  heroGreetingSub: { fontSize: typography.sizes.sm, color: '#B8D4FF', marginTop: 2, marginBottom: spacing.sm },
+  heroBadgesRow: { flexDirection: 'row', gap: spacing.sm },
+  heroStreakBadge: {
+    flex: 1, backgroundColor: colors.primaryDark, borderRadius: radius.md,
+    padding: spacing.sm, flexDirection: 'row', alignItems: 'center', gap: spacing.xs,
   },
-  streakFire: { fontSize: 20 },
-  streakNum: { fontSize: typography.sizes.xl, fontWeight: typography.weights.extrabold, color: colors.white },
-  streakLabel: { fontSize: typography.sizes.xs, color: '#B8D4FF' },
-  countdownBanner: {
-    flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
-    backgroundColor: colors.accent, marginHorizontal: spacing.md, marginTop: spacing.md,
-    borderRadius: radius.lg, padding: spacing.md,
+  heroCountdownBadge: {
+    flex: 1, backgroundColor: colors.accent, borderRadius: radius.md,
+    padding: spacing.sm, flexDirection: 'row', alignItems: 'center', gap: spacing.xs,
   },
-  countdownTitle: { fontSize: typography.sizes.lg, fontWeight: typography.weights.extrabold, color: colors.white },
-  countdownSub: { fontSize: typography.sizes.xs, color: 'rgba(255,255,255,0.8)', marginTop: 4 },
-  countdownBadge: { alignItems: 'center' },
-  countdownDays: { fontSize: typography.sizes.xxxl, fontWeight: typography.weights.extrabold, color: colors.white },
-  countdownDaysLabel: { fontSize: typography.sizes.xs, color: 'rgba(255,255,255,0.8)' },
+  heroBadgeIcon: { fontSize: 22 },
+  heroBadgeNum: { fontSize: typography.sizes.xl, fontWeight: typography.weights.extrabold, color: colors.white },
+  heroBadgeLabel: { fontSize: typography.sizes.xs, color: 'rgba(255,255,255,0.8)', marginTop: 1 },
+  heroBadgeExamName: { fontSize: typography.sizes.xs, fontWeight: typography.weights.bold, color: colors.white },
   sectionTitle: {
     fontSize: typography.sizes.lg, fontWeight: typography.weights.extrabold,
     color: colors.text, marginHorizontal: spacing.md, marginTop: spacing.lg, marginBottom: spacing.sm,

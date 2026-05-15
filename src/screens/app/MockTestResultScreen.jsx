@@ -36,7 +36,7 @@ export default function MockTestResultScreen({ navigation, route }) {
   };
 
   return (
-    <SafeAreaView style={styles.safe}>
+    <SafeAreaView style={styles.safe} edges={['top']}>
       <ScrollView showsVerticalScrollIndicator={false}>
 
         {/* Result Hero */}

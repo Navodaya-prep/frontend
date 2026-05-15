@@ -133,14 +133,14 @@ export default function CourseDetailScreen({ route, navigation }) {
   );
 
   if (loading && chapters.length === 0) return (
-    <SafeAreaView style={styles.safe} edges={['top']}>
+    <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
       {renderHeader(course, subjectColor, navigation)}
       <AppLoader />
     </SafeAreaView>
   );
 
   return (
-    <SafeAreaView style={styles.safe} edges={['top']}>
+    <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
       <View style={styles.topBar}>
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
           <Text style={[styles.backText, { color: subjectColor }]}>←</Text>

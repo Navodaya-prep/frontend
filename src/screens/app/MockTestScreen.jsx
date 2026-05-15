@@ -110,7 +110,7 @@ export default function MockTestScreen({ navigation }) {
   if (status === 'loading') return <AppLoader fullScreen />;
   if (!activeTest || questions.length === 0) {
     return (
-      <SafeAreaView style={styles.safe}>
+      <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
         <View style={styles.errorState}>
           <Text style={styles.errorText}>Test not loaded.</Text>
           <TouchableOpacity onPress={() => navigation.goBack()}>
@@ -125,7 +125,7 @@ export default function MockTestScreen({ navigation }) {
   const currentQuestion = questions[currentIndex];
 
   return (
-    <SafeAreaView style={styles.safe}>
+    <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={confirmExit}>

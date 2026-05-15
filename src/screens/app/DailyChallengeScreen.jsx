@@ -81,7 +81,7 @@ export default function DailyChallengeScreen({ navigation }) {
 
   if (status === 'loading') {
     return (
-      <SafeAreaView style={styles.safe}>
+      <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
         <Header navigation={navigation} />
         <AppLoader />
       </SafeAreaView>
@@ -90,7 +90,7 @@ export default function DailyChallengeScreen({ navigation }) {
 
   if (status === 'failed' || !challenge) {
     return (
-      <SafeAreaView style={styles.safe}>
+      <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
         <Header navigation={navigation} />
         <View style={styles.emptyState}>
           <Text style={styles.emptyEmoji}>😴</Text>
@@ -105,7 +105,7 @@ export default function DailyChallengeScreen({ navigation }) {
   }
 
   return (
-    <SafeAreaView style={styles.safe} edges={['top']}>
+    <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
       <Header navigation={navigation} />
 
       <ScrollView style={styles.scroll} showsVerticalScrollIndicator={false}>

@@ -75,7 +75,7 @@ export default function PracticeChaptersScreen({ route, navigation }) {
   const subjectColor = subject.color || colors.primary;
 
   return (
-    <SafeAreaView style={styles.safe} edges={['top']}>
+    <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
       <View style={[styles.header, { borderBottomColor: subjectColor + '40' }]}>
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
           <Text style={[styles.backText, { color: subjectColor }]}>←</Text>
