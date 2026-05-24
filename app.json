@@ -1,8 +1,8 @@
 {
   "expo": {
-    "name": "navodaya",
+    "name": "NavodayaSarthi",
     "slug": "navodaya",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -12,7 +12,8 @@
       "backgroundColor": "#ffffff"
     },
     "android": {
-      "package": "com.navodayaprime.app",
+      "package": "com.navodayasarthi.app",
+      "versionCode": 2,
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
         "foregroundImage": "./assets/android-icon-foreground.png",
@@ -21,7 +22,13 @@
       }
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.navodayasarthi.app",
+      "infoPlist": {
+        "NSCameraUsageDescription": "Camera is needed for live classes",
+        "NSMicrophoneUsageDescription": "Microphone is needed for participating in live classes",
+        "NSUserNotificationsUsageDescription": "Notifications alert you about live classes, exam reminders and updates"
+      }
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -34,6 +41,10 @@
       "eas": {
         "projectId": "09bc9262-a375-49fa-8519-0347b2a92634"
       }
-    }
+    },
+    "developmentClient": {
+      "silentLaunch": true
+    },
+    "owner": "ved18"
   }
 }

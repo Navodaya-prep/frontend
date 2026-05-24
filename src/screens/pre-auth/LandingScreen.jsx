@@ -25,7 +25,7 @@ const SUCCESS_STORIES = [
     school: 'JNV Lucknow',
     year: '2024',
     rank: 'AIR 127',
-    story: 'Coming from a small village in UP, I never imagined I would crack JNVST. Navodaya Prime\'s video lessons helped me understand concepts that seemed impossible before. The daily practice tests and AI-powered doubt resolution were game changers. Today, I\'m proudly studying at JNV Lucknow!',
+    story: 'Coming from a small village in UP, I never imagined I would crack JNVST. NavodayaSarthi\'s video lessons helped me understand concepts that seemed impossible before. The daily practice tests and AI-powered doubt resolution were game changers. Today, I\'m proudly studying at JNV Lucknow!',
     subjects: { mental: 38, arithmetic: 19, language: 18 }
   },
   { 
@@ -34,7 +34,7 @@ const SUCCESS_STORIES = [
     school: 'JNV Bhopal',
     year: '2024',
     rank: 'AIR 243',
-    story: 'The mock tests on Navodaya Prime are exactly like the real exam. I practiced every single one and learned from my mistakes. The detailed solutions and explanation videos made all the difference. The live doubt sessions every evening cleared all my confusions right before the exam.',
+    story: 'The mock tests on NavodayaSarthi are exactly like the real exam. I practiced every single one and learned from my mistakes. The detailed solutions and explanation videos made all the difference. The live doubt sessions every evening cleared all my confusions right before the exam.',
     subjects: { mental: 37, arithmetic: 18, language: 19 }
   },
   { 
@@ -43,7 +43,7 @@ const SUCCESS_STORIES = [
     school: 'JNV Patna',
     year: '2023',
     rank: 'AIR 156',
-    story: 'My family couldn\'t afford coaching classes. Navodaya Prime was completely free for me. The structured study plan, chapter-wise tests, and regular progress tracking kept me motivated. I studied 2 hours daily for 6 months and achieved my dream of getting into Navodaya!',
+    story: 'My family couldn\'t afford coaching classes. NavodayaSarthi was completely free for me. The structured study plan, chapter-wise tests, and regular progress tracking kept me motivated. I studied 2 hours daily for 6 months and achieved my dream of getting into Navodaya!',
     subjects: { mental: 39, arithmetic: 17, language: 18 }
   },
   { 
@@ -52,7 +52,7 @@ const SUCCESS_STORIES = [
     school: 'JNV Jaipur',
     year: '2024',
     rank: 'AIR 89',
-    story: 'The practice hub with 1200+ questions was my secret weapon. I solved every question twice. The difficulty levels helped me progress gradually. The leaderboard feature motivated me to compete with thousands of other students. Thank you Navodaya Prime for making my dream come true!',
+    story: 'The practice hub with 1200+ questions was my secret weapon. I solved every question twice. The difficulty levels helped me progress gradually. The leaderboard feature motivated me to compete with thousands of other students. Thank you NavodayaSarthi for making my dream come true!',
     subjects: { mental: 40, arithmetic: 19, language: 19 }
   },
 ];
@@ -68,7 +68,7 @@ export default function LandingScreen({ navigation }) {
         <SafeAreaView style={styles.header}>
           <View style={styles.headerContent}>
             <View>
-              <Text style={styles.logo}>🏫 Navodaya</Text>
+              <Text style={styles.logo}>🏫 NavodayaSarthi</Text>
               <Text style={styles.logoSub}>Prime</Text>
             </View>
             <TouchableOpacity style={styles.loginBtn} onPress={() => navigation.navigate('Login')}>
@@ -82,7 +82,7 @@ export default function LandingScreen({ navigation }) {
           <View style={styles.heroBadge}>
             <Text style={styles.heroBadgeText}>🎯 #1 JNVST Preparation Platform</Text>
           </View>
-          <Text style={styles.heroTitle}>Your Journey to{'\n'}Navodaya Excellence{'\n'}Starts Here</Text>
+          <Text style={styles.heroTitle}>Your Journey to{'\n'}NavodayaSarthi Excellence{'\n'}Starts Here</Text>
           <Text style={styles.heroSubtitle}>
             Join 50,000+ students preparing for Jawahar Navodaya Vidyalaya Selection Test with India's most trusted JNVST app. Learn from expert educators, practice with 1200+ questions, and track your progress every day.
           </Text>
@@ -241,7 +241,7 @@ export default function LandingScreen({ navigation }) {
 
         {/* Footer */}
         <View style={styles.footer}>
-          <Text style={styles.footerLogo}>🏫 Navodaya Prime</Text>
+          <Text style={styles.footerLogo}>🏫 NavodayaSarthiSarthi</Text>
           <Text style={styles.footerTagline}>India's #1 JNVST Preparation Platform</Text>
           
           <View style={styles.footerLinks}>
@@ -268,7 +268,7 @@ export default function LandingScreen({ navigation }) {
 
           <View style={styles.footerLinks}>
             <Text style={styles.footerLinkTitle}>Contact Us</Text>
-            <Text style={styles.footerContact}>📧 support@navodayaprime.com</Text>
+            <Text style={styles.footerContact}>📧 support@navodayasarthi.com</Text>
             <Text style={styles.footerContact}>📞 +91 99999 99999</Text>
             <Text style={styles.footerContact}>💬 WhatsApp Support Available</Text>
           </View>
@@ -285,7 +285,7 @@ export default function LandingScreen({ navigation }) {
           </View>
 
           <View style={styles.footerBottom}>
-            <Text style={styles.footerCopyright}>© 2024 Navodaya Prime. All rights reserved.</Text>
+            <Text style={styles.footerCopyright}>© 2024 NavodayaSarthi. All rights reserved.</Text>
             <Text style={styles.footerMadeWith}>Made with ❤️ in India for Indian Students</Text>
           </View>
         </View>

@@ -12,7 +12,7 @@ const TEAM = [
 ];
 
 const MILESTONES = [
-  { year: '2020', event: 'Navodaya Prime Founded' },
+  { year: '2020', event: 'NavodayaSarthi Founded' },
   { year: '2021', event: '10,000 students joined' },
   { year: '2022', event: 'Launched in 15 states' },
   { year: '2023', event: '50,000 students, 95% success rate' },
@@ -35,7 +35,7 @@ export default function AboutScreen({ navigation }) {
           <Text style={styles.heroEmoji}>🏫</Text>
           <Text style={styles.heroTitle}>Our Story</Text>
           <Text style={styles.heroText}>
-            Navodaya Prime was born from a simple belief — every child in rural India deserves a chance at world-class education.
+            NavodayaSarthi was born from a simple belief — every child in rural India deserves a chance at world-class education.
             The Jawahar Navodaya Vidyalaya system provides exactly that, but the path to getting in has always been tough for students without access to quality coaching.
           </Text>
           <Text style={styles.heroText}>

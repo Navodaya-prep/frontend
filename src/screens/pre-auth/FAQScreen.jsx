@@ -8,7 +8,7 @@ import { API_BASE_URL } from '../../config';
 
 const FAQS = [
   { q: 'When is the JNVST exam held?', a: 'JNVST for Class 6 is typically held in November every year. For Class 9, it is held in February. Admit cards are released 2-3 weeks before the exam.' },
-  { q: 'Is this app free to use?', a: 'Yes! Navodaya Prime is completely free for all students. Every feature — practice questions, mock tests, video lessons, live classes, and more — is fully unlocked at no cost.' },
+  { q: 'Is this app free to use?', a: 'Yes! NavodayaSarthi is completely free for all students. Every feature — practice questions, mock tests, video lessons, live classes, and more — is fully unlocked at no cost.' },
   { q: 'How to reset my password?', a: 'We use OTP-based login — no password needed! Just enter your registered mobile number and verify the OTP you receive via SMS.' },
   { q: 'Which classes is this app for?', a: 'This app is designed for Class 5 students appearing for JNVST (for Class 6 admission) and Class 8 students appearing for JNVST (for Class 9 admission).' },
   { q: 'Does the app work offline?', a: 'Practice questions and downloaded content are accessible offline. Video streaming requires an internet connection, though we optimize for low-bandwidth usage.' },
@@ -40,7 +40,7 @@ export default function FAQScreen({ navigation }) {
   const [submitted, setSubmitted] = useState(false);
 
   const openWhatsApp = () => {
-    Linking.openURL('https://wa.me/918175947318?text=Hi%2C%20I%20need%20help%20with%20Navodaya%20Prime');
+    Linking.openURL('https://wa.me/918175947318?text=Hi%2C%20I%20need%20help%20with%20NavodayaSarthi');
   };
 
   const validate = () => {

@@ -39,7 +39,7 @@ export default function LoginScreen({ navigation }) {
 
           <View style={styles.logoArea}>
             <Text style={styles.logoEmoji}>🏫</Text>
-            <Text style={styles.logoTitle}>Navodaya Prime</Text>
+            <Text style={styles.logoTitle}>NavodayaSarthi</Text>
             <Text style={styles.logoSub}>Welcome back!</Text>
           </View>
 

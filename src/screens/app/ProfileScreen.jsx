@@ -31,7 +31,7 @@ export default function ProfileScreen({ navigation }) {
       }
       dispatch(fetchProfile());
     } catch (error) {
-      console.error('Failed to load profile:', error);
+      // silently fail — profile loads from cached Redux state
     }
   };
 
@@ -96,7 +96,7 @@ export default function ProfileScreen({ navigation }) {
         <TouchableOpacity style={styles.logoutBtn} onPress={handleLogout}>
           <Text style={styles.logoutText}>Logout</Text>
         </TouchableOpacity>
-        <Text style={styles.version}>Navodaya Prime v1.0.0</Text>
+        <Text style={styles.version}>NavodayaSarthi v1.0.0</Text>
       </ScrollView>
     </SafeAreaView>
   );

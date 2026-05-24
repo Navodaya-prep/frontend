@@ -8,11 +8,11 @@ import { spacing } from '../theme/spacing';
 const SECTIONS = [
   {
     heading: '1. Acceptance of Terms',
-    body: 'By accessing or using Navodaya Prime, you agree to be bound by these Terms of Service. If you do not agree, please do not use the app.',
+    body: 'By accessing or using NavodayaSarthi, you agree to be bound by these Terms of Service. If you do not agree, please do not use the app.',
   },
   {
     heading: '2. Use of the App',
-    body: 'Navodaya Prime is intended solely for students preparing for the Jawahar Navodaya Vidyalaya Selection Test (JNVST). You agree to use the app only for lawful, personal, and non-commercial purposes.',
+    body: 'NavodayaSarthi is intended solely for students preparing for the Jawahar Navodaya Vidyalaya Selection Test (JNVST). You agree to use the app only for lawful, personal, and non-commercial purposes.',
   },
   {
     heading: '3. Account Responsibility',
@@ -20,7 +20,7 @@ const SECTIONS = [
   },
   {
     heading: '4. Content',
-    body: 'All content on Navodaya Prime — including videos, questions, and study material — is the intellectual property of Navodaya Prime. You may not copy, distribute, or reproduce any content without prior written permission.',
+    body: 'All content on NavodayaSarthi — including videos, questions, and study material — is the intellectual property of NavodayaSarthi. You may not copy, distribute, or reproduce any content without prior written permission.',
   },
   {
     heading: '5. Termination',
@@ -28,7 +28,7 @@ const SECTIONS = [
   },
   {
     heading: '6. Disclaimer',
-    body: 'Navodaya Prime provides content on a best-effort basis. We do not guarantee specific results or selection in JNVST. The app is provided "as is" without warranties of any kind.',
+    body: 'NavodayaSarthi provides content on a best-effort basis. We do not guarantee specific results or selection in JNVST. The app is provided "as is" without warranties of any kind.',
   },
   {
     heading: '7. Changes to Terms',
@@ -36,7 +36,7 @@ const SECTIONS = [
   },
   {
     heading: '8. Contact',
-    body: 'For any questions about these terms, contact us at support@navodayaprime.com.',
+    body: 'For any questions about these terms, contact us at support@navodayasarthi.com.',
   },
 ];
 

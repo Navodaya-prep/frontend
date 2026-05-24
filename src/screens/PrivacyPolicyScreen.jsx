@@ -24,7 +24,7 @@ const SECTIONS = [
   },
   {
     heading: '5. Children\'s Privacy',
-    body: 'Navodaya Prime is designed for students under parental or school guidance. We do not knowingly collect data from children without appropriate consent.',
+    body: 'NavodayaSarthi is designed for students under parental or school guidance. We do not knowingly collect data from children without appropriate consent.',
   },
   {
     heading: '6. Retention',
@@ -36,7 +36,7 @@ const SECTIONS = [
   },
   {
     heading: '8. Contact',
-    body: 'For privacy-related concerns, reach us at support@navodayaprime.com.',
+    body: 'For privacy-related concerns, reach us at support@navodayasarthi.com.',
   },
 ];
 

@@ -8,7 +8,10 @@ export const sendOtp = createAsyncThunk('auth/sendOtp', async (phone, { rejectWi
     const res = await authApi.sendOtp(phone);
     return res.data;
   } catch (err) {
-    return rejectWithValue(err.response?.data?.message || 'Failed to send OTP');
+    const msg = err.response?.data?.message
+      || err.message
+      || 'Failed to send OTP';
+    return rejectWithValue(msg);
   }
 });
 

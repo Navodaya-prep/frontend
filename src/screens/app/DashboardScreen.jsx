@@ -49,14 +49,11 @@ export default function DashboardScreen({ navigation }) {
 
   // Calculate days left dynamically
   const daysLeft = useMemo(() => {
-    console.log('Calculating days left. examDate:', examDate);
     if (!examDate) return null;
     const today = new Date();
     const exam = new Date(examDate);
-    console.log('Today:', today, 'Exam:', exam);
     const diffTime = exam - today;
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    console.log('Days left:', diffDays);
     return diffDays > 0 ? diffDays : 0;
   }, [examDate]);
 
