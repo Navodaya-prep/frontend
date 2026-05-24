@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import {
-  View, Text, TextInput, TouchableOpacity, StyleSheet, KeyboardAvoidingView, Platform, ScrollView, Alert,
+  View, Text, TextInput, TouchableOpacity, StyleSheet, KeyboardAvoidingView, Platform, ScrollView, Alert, Image,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useDispatch, useSelector } from 'react-redux';
@@ -38,7 +38,7 @@ export default function LoginScreen({ navigation }) {
           </TouchableOpacity>
 
           <View style={styles.logoArea}>
-            <Text style={styles.logoEmoji}>🏫</Text>
+            <Image source={require('../../../assets/logo.jpg')} style={styles.logoImage} />
             <Text style={styles.logoTitle}>NavodayaSarthi</Text>
             <Text style={styles.logoSub}>Welcome back!</Text>
           </View>
@@ -82,7 +82,7 @@ const styles = StyleSheet.create({
   backBtn: { marginBottom: spacing.lg },
   backText: { color: colors.primary, fontWeight: typography.weights.semibold, fontSize: typography.sizes.md },
   logoArea: { alignItems: 'center', marginBottom: spacing.xl },
-  logoEmoji: { fontSize: 56, marginBottom: spacing.sm },
+  logoImage: { width: 80, height: 80, borderRadius: 16, resizeMode: 'contain', marginBottom: spacing.sm },
   logoTitle: { fontSize: typography.sizes.xxl, fontWeight: typography.weights.extrabold, color: colors.primary },
   logoSub: { fontSize: typography.sizes.md, color: colors.textSecondary, marginTop: 4 },
   title: { fontSize: typography.sizes.xl, fontWeight: typography.weights.extrabold, color: colors.text, marginBottom: spacing.sm },

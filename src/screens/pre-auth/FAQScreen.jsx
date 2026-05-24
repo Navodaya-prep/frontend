@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, TextInput, StyleSheet, Linking, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import Footer from '../../components/common/Footer';
 import { colors } from '../../theme/colors';
 import { typography } from '../../theme/typography';
 import { radius, spacing } from '../../theme/spacing';
@@ -170,6 +171,8 @@ export default function FAQScreen({ navigation }) {
             <Text style={styles.whatsappSub}>Get instant support from our team</Text>
           </View>
         </TouchableOpacity>
+
+        <Footer navigation={navigation} />
       </ScrollView>
     </SafeAreaView>
   );

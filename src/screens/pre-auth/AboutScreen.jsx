@@ -4,19 +4,17 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { colors } from '../../theme/colors';
 import { typography } from '../../theme/typography';
 import { radius, spacing } from '../../theme/spacing';
+import Footer from '../../components/common/Footer';
+
+const AVATAR_COLORS = ['#E53935', '#8E24AA', '#1E88E5', '#00897B', '#F4511E', '#6D4C41'];
+const getAvatarColor = (name) => AVATAR_COLORS[name.charCodeAt(0) % AVATAR_COLORS.length];
 
 const TEAM = [
-  { name: 'Rajesh Kumar', role: 'Founder & Math Expert', exp: '15 years experience', icon: '👨‍🏫' },
-  { name: 'Anita Singh', role: 'Language & Hindi Expert', exp: '12 years experience', icon: '👩‍🏫' },
-  { name: 'Dr. Mohan Lal', role: 'Mental Ability Specialist', exp: '10 years experience', icon: '🧑‍🔬' },
-];
-
-const MILESTONES = [
-  { year: '2020', event: 'NavodayaSarthi Founded' },
-  { year: '2021', event: '10,000 students joined' },
-  { year: '2022', event: 'Launched in 15 states' },
-  { year: '2023', event: '50,000 students, 95% success rate' },
-  { year: '2024', event: 'Mobile app launched' },
+  { name: 'Deepak Kumar', role: 'Co-Founder · Alumni of Navodaya', exp: 'Building India\'s best JNVST platform' },
+  { name: 'Vikram Kumar', role: 'Co-Founder · Alumni of Navodaya', exp: 'Building India\'s best JNVST platform' },
+  { name: 'DK Gaur', role: 'Math Expert', exp: '20 years experience' },
+  { name: 'Suraj Yadav', role: 'Co-Founder · Reasoning Expert', exp: '5 years experience' },
+  { name: 'Rahul Kumar', role: 'Language Expert · Alumni of Navodaya', exp: '3 years experience' },
 ];
 
 export default function AboutScreen({ navigation }) {
@@ -39,7 +37,7 @@ export default function AboutScreen({ navigation }) {
             The Jawahar Navodaya Vidyalaya system provides exactly that, but the path to getting in has always been tough for students without access to quality coaching.
           </Text>
           <Text style={styles.heroText}>
-            We built this app to bridge that gap. Our team of expert educators from IIT, IIM, and top universities work tirelessly to create content that is simple, effective, and accessible — even on slow 2G connections.
+            We built this app to bridge that gap. Our team of expert educators work tirelessly to create content that is simple, effective, and accessible — even on slow 2G connections.
           </Text>
         </View>
 
@@ -57,8 +55,8 @@ export default function AboutScreen({ navigation }) {
           <Text style={styles.sectionTitle}>Meet Our Experts</Text>
           {TEAM.map((member) => (
             <View key={member.name} style={styles.teamCard}>
-              <View style={styles.teamAvatar}>
-                <Text style={styles.teamAvatarText}>{member.icon}</Text>
+              <View style={[styles.teamAvatar, { backgroundColor: getAvatarColor(member.name) }]}>
+                <Text style={styles.teamAvatarInitial}>{member.name[0]}</Text>
               </View>
               <View style={styles.teamInfo}>
                 <Text style={styles.teamName}>{member.name}</Text>
@@ -69,26 +67,7 @@ export default function AboutScreen({ navigation }) {
           ))}
         </View>
 
-        {/* Milestones */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Our Journey</Text>
-          {MILESTONES.map((m, i) => (
-            <View key={m.year} style={styles.milestone}>
-              <View style={styles.milestoneLeft}>
-                <View style={styles.milestoneDot} />
-                {i < MILESTONES.length - 1 && <View style={styles.milestoneLine} />}
-              </View>
-              <View style={styles.milestoneContent}>
-                <Text style={styles.milestoneYear}>{m.year}</Text>
-                <Text style={styles.milestoneEvent}>{m.event}</Text>
-              </View>
-            </View>
-          ))}
-        </View>
-
-        <TouchableOpacity style={styles.ctaBtn} onPress={() => navigation.navigate('Login')}>
-          <Text style={styles.ctaBtnText}>Join 50,000+ Students →</Text>
-        </TouchableOpacity>
+        <Footer navigation={navigation} />
       </ScrollView>
     </SafeAreaView>
   );
@@ -125,36 +104,15 @@ const styles = StyleSheet.create({
     shadowColor: '#000', shadowOpacity: 0.06, shadowRadius: 4, shadowOffset: { width: 0, height: 2 },
   },
   teamAvatar: {
-    width: 56, height: 56, borderRadius: 28, backgroundColor: colors.primaryLight,
-    alignItems: 'center', justifyContent: 'center', marginRight: spacing.md,
+    width: 52, height: 52, borderRadius: 26,
+    alignItems: 'center', justifyContent: 'center',
+    marginRight: spacing.md,
   },
-  teamAvatarText: { fontSize: 28 },
+  teamAvatarInitial: {
+    fontSize: 22, fontWeight: 'bold', color: '#fff',
+  },
   teamInfo: { flex: 1 },
   teamName: { fontSize: typography.sizes.md, fontWeight: typography.weights.bold, color: colors.text },
   teamRole: { fontSize: typography.sizes.sm, color: colors.primary, marginTop: 2 },
   teamExp: { fontSize: typography.sizes.xs, color: colors.textSecondary, marginTop: 2 },
-  milestone: { flexDirection: 'row', marginBottom: 0 },
-  milestoneLeft: { width: 24, alignItems: 'center' },
-  milestoneDot: {
-    width: 14, height: 14, borderRadius: 7,
-    backgroundColor: colors.primary, marginTop: 4,
-  },
-  milestoneLine: { width: 2, flex: 1, backgroundColor: colors.border, marginTop: 4 },
-  milestoneContent: { flex: 1, paddingLeft: spacing.md, paddingBottom: spacing.md },
-  milestoneYear: { fontSize: typography.sizes.sm, fontWeight: typography.weights.bold, color: colors.accent },
-  milestoneEvent: { fontSize: typography.sizes.md, color: colors.text },
-  ctaBtn: {
-    backgroundColor: colors.primary, 
-    margin: spacing.md, 
-    marginBottom: spacing.xl,
-    borderRadius: radius.lg, 
-    paddingVertical: 18, 
-    alignItems: 'center',
-    elevation: 4,
-    shadowColor: colors.primary,
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    shadowOffset: { width: 0, height: 4 },
-  },
-  ctaBtnText: { color: colors.white, fontSize: typography.sizes.lg, fontWeight: typography.weights.extrabold, letterSpacing: 0.5 },
 });

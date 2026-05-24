@@ -174,6 +174,9 @@ export default function DailyChallengeScreen({ navigation }) {
             </View>
 
             <Text style={styles.questionText}>{challenge.text}</Text>
+            {challenge.textHi ? (
+              <Text style={styles.questionTextHi}>{challenge.textHi}</Text>
+            ) : null}
 
             {/* Options */}
             <View style={styles.optionsContainer}>
@@ -377,7 +380,11 @@ const styles = StyleSheet.create({
   diffBadgeText: { fontSize: typography.sizes.xs, fontWeight: typography.weights.bold },
   questionText: {
     fontSize: typography.sizes.lg, fontWeight: typography.weights.semibold,
-    color: colors.text, lineHeight: 26, marginBottom: spacing.lg,
+    color: colors.text, lineHeight: 26, marginBottom: spacing.xs,
+  },
+  questionTextHi: {
+    fontSize: typography.sizes.md, color: colors.textSecondary,
+    lineHeight: 24, marginBottom: spacing.lg, fontStyle: 'italic',
   },
 
   // Options

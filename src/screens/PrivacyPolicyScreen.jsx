@@ -36,7 +36,7 @@ const SECTIONS = [
   },
   {
     heading: '8. Contact',
-    body: 'For privacy-related concerns, reach us at support@navodayasarthi.com.',
+    body: 'For privacy-related concerns, reach us at navodayasarthi.help@gmail.com.',
   },
 ];
 

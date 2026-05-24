@@ -36,7 +36,7 @@ const SECTIONS = [
   },
   {
     heading: '8. Contact',
-    body: 'For any questions about these terms, contact us at support@navodayasarthi.com.',
+    body: 'For any questions about these terms, contact us at navodayasarthi.help@gmail.com.',
   },
 ];
 

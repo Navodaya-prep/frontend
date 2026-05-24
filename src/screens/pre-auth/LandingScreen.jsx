@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import {
-  View, Text, ScrollView, TouchableOpacity, StyleSheet, StatusBar, Dimensions, Modal,
+  View, Text, ScrollView, TouchableOpacity, StyleSheet, StatusBar, Dimensions, Modal, Image,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { colors } from '../../theme/colors';
@@ -10,7 +10,7 @@ import { radius, spacing } from '../../theme/spacing';
 const { width } = Dimensions.get('window');
 
 const FEATURES = [
-  { icon: '🎥', title: 'Video Lessons', desc: 'Expert-taught concept videos', highlight: '500+ Videos' },
+  { icon: '🎥', title: 'Video Lessons', desc: 'Expert-taught concept videos', highlight: '100+ Videos' },
   { icon: '📋', title: 'Mock Tests', desc: 'Full-length timed exams', highlight: '50+ Tests' },
   { icon: '🧠', title: 'Practice MCQs', desc: '1200+ chapter-wise questions', highlight: '1200+ MCQs' },
   { icon: '👨‍🏫', title: 'Expert Mentors', desc: 'Doubt support anytime', highlight: '24/7 Support' },
@@ -19,41 +19,33 @@ const FEATURES = [
 ];
 
 const SUCCESS_STORIES = [
-  { 
-    name: 'Priya Sharma', 
-    state: 'Uttar Pradesh', 
-    school: 'JNV Lucknow',
+  {
+    name: 'Utkarsh',
+    state: 'Uttar Pradesh',
+    school: 'JNV Ambedkar Nagar',
     year: '2024',
-    rank: 'AIR 127',
-    story: 'Coming from a small village in UP, I never imagined I would crack JNVST. NavodayaSarthi\'s video lessons helped me understand concepts that seemed impossible before. The daily practice tests and AI-powered doubt resolution were game changers. Today, I\'m proudly studying at JNV Lucknow!',
-    subjects: { mental: 38, arithmetic: 19, language: 18 }
+    story: 'Coming from a small village in UP, I never imagined I would crack JNVST. NavodayaSarthi\'s video lessons helped me understand concepts that seemed impossible before. The daily practice tests and doubt resolution were game changers. Today, I\'m proudly studying at JNV Ambedkar Nagar!',
   },
-  { 
-    name: 'Arjun Patel', 
-    state: 'Madhya Pradesh', 
-    school: 'JNV Bhopal',
+  {
+    name: 'Rishikesh Mishra',
+    state: 'Uttar Pradesh',
+    school: 'JNV Ambedkar Nagar',
     year: '2024',
-    rank: 'AIR 243',
     story: 'The mock tests on NavodayaSarthi are exactly like the real exam. I practiced every single one and learned from my mistakes. The detailed solutions and explanation videos made all the difference. The live doubt sessions every evening cleared all my confusions right before the exam.',
-    subjects: { mental: 37, arithmetic: 18, language: 19 }
   },
-  { 
-    name: 'Anjali Devi', 
-    state: 'Bihar', 
-    school: 'JNV Patna',
-    year: '2023',
-    rank: 'AIR 156',
-    story: 'My family couldn\'t afford coaching classes. NavodayaSarthi was completely free for me. The structured study plan, chapter-wise tests, and regular progress tracking kept me motivated. I studied 2 hours daily for 6 months and achieved my dream of getting into Navodaya!',
-    subjects: { mental: 39, arithmetic: 17, language: 18 }
-  },
-  { 
-    name: 'Rahul Kumar', 
-    state: 'Rajasthan', 
-    school: 'JNV Jaipur',
+  {
+    name: 'Amit Verma',
+    state: 'Uttar Pradesh',
+    school: 'JNV Faizabad',
     year: '2024',
-    rank: 'AIR 89',
+    story: 'My family couldn\'t afford coaching classes. NavodayaSarthi was completely free for me. The structured study plan, chapter-wise tests, and regular progress tracking kept me motivated. I studied 2 hours daily for 6 months and achieved my dream of getting into Navodaya!',
+  },
+  {
+    name: 'Anurag Anand',
+    state: 'Uttar Pradesh',
+    school: 'JNV Prayagraj',
+    year: '2024',
     story: 'The practice hub with 1200+ questions was my secret weapon. I solved every question twice. The difficulty levels helped me progress gradually. The leaderboard feature motivated me to compete with thousands of other students. Thank you NavodayaSarthi for making my dream come true!',
-    subjects: { mental: 40, arithmetic: 19, language: 19 }
   },
 ];
 
@@ -67,9 +59,9 @@ export default function LandingScreen({ navigation }) {
         {/* Header */}
         <SafeAreaView style={styles.header}>
           <View style={styles.headerContent}>
-            <View>
-              <Text style={styles.logo}>🏫 NavodayaSarthi</Text>
-              <Text style={styles.logoSub}>Prime</Text>
+            <View style={styles.logoRow}>
+              <Image source={require('../../../assets/logo.jpg')} style={styles.logoImg} />
+              <Text style={styles.logo}>NavodayaSarthi</Text>
             </View>
             <TouchableOpacity style={styles.loginBtn} onPress={() => navigation.navigate('Login')}>
               <Text style={styles.loginBtnText}>Login</Text>
@@ -84,7 +76,7 @@ export default function LandingScreen({ navigation }) {
           </View>
           <Text style={styles.heroTitle}>Your Journey to{'\n'}NavodayaSarthi Excellence{'\n'}Starts Here</Text>
           <Text style={styles.heroSubtitle}>
-            Join 50,000+ students preparing for Jawahar Navodaya Vidyalaya Selection Test with India's most trusted JNVST app. Learn from expert educators, practice with 1200+ questions, and track your progress every day.
+            Join 1,000+ students preparing for Jawahar Navodaya Vidyalaya Selection Test with India's most trusted JNVST app. Learn from expert educators, practice with 1200+ questions, and track your progress every day.
           </Text>
           <TouchableOpacity style={styles.ctaBtn} onPress={() => navigation.navigate('Login')}>
             <Text style={styles.ctaBtnText}>Get Started →</Text>
@@ -94,10 +86,10 @@ export default function LandingScreen({ navigation }) {
           {/* Stats */}
           <View style={styles.statsRow}>
             {[
-              ['50K+', 'Active Students'],
+              ['1K+', 'Active Students'],
               ['1200+', 'Practice Questions'],
-              ['95%', 'Success Rate'],
-              ['500+', 'Video Lessons']
+              ['3 Subjects', 'Full Coverage'],
+              ['100+', 'Video Lessons']
             ].map(([num, label]) => (
               <View key={label} style={styles.statItem}>
                 <Text style={styles.statNum}>{num}</Text>
@@ -112,8 +104,6 @@ export default function LandingScreen({ navigation }) {
           <Text style={styles.trustTitle}>Trusted by Students Across India 🇮🇳</Text>
           <View style={styles.trustGrid}>
             {[
-              { icon: '⭐', text: '4.8/5 Rating', sub: '10,000+ reviews' },
-              { icon: '🏆', text: 'Award Winning', sub: 'Best EdTech 2024' },
               { icon: '🔒', text: '100% Safe', sub: 'Secure & Private' },
               { icon: '📱', text: 'Works Offline', sub: '2G Compatible' },
             ].map((item) => (
@@ -188,9 +178,6 @@ export default function LandingScreen({ navigation }) {
                 </View>
                 <Text style={styles.storyName}>{s.name}</Text>
                 <Text style={styles.storySchool}>{s.school}</Text>
-                <View style={styles.storyRankBadge}>
-                  <Text style={styles.storyRank}>{s.rank}</Text>
-                </View>
                 <Text style={styles.storyYear}>Class of {s.year}</Text>
                 <Text style={styles.storyReadMore}>Tap to read story →</Text>
               </TouchableOpacity>
@@ -241,8 +228,11 @@ export default function LandingScreen({ navigation }) {
 
         {/* Footer */}
         <View style={styles.footer}>
-          <Text style={styles.footerLogo}>🏫 NavodayaSarthiSarthi</Text>
-          <Text style={styles.footerTagline}>India's #1 JNVST Preparation Platform</Text>
+          <View style={styles.footerLogoRow}>
+            <Image source={require('../../../assets/logo.jpg')} style={styles.footerLogoImg} />
+            <Text style={styles.footerLogo}>NavodayaSarthi</Text>
+          </View>
+          <Text style={styles.footerTagline}>India's JNVST Preparation Platform</Text>
           
           <View style={styles.footerLinks}>
             <Text style={styles.footerLinkTitle}>Quick Links</Text>
@@ -256,10 +246,10 @@ export default function LandingScreen({ navigation }) {
                 </TouchableOpacity>
               </View>
               <View style={styles.quickLinksColumn}>
-                <TouchableOpacity>
+                <TouchableOpacity onPress={() => navigation.navigate('PrivacyPolicy')}>
                   <Text style={styles.footerLink}>Privacy Policy</Text>
                 </TouchableOpacity>
-                <TouchableOpacity>
+                <TouchableOpacity onPress={() => navigation.navigate('Terms')}>
                   <Text style={styles.footerLink}>Terms of Service</Text>
                 </TouchableOpacity>
               </View>
@@ -268,24 +258,14 @@ export default function LandingScreen({ navigation }) {
 
           <View style={styles.footerLinks}>
             <Text style={styles.footerLinkTitle}>Contact Us</Text>
-            <Text style={styles.footerContact}>📧 support@navodayasarthi.com</Text>
-            <Text style={styles.footerContact}>📞 +91 99999 99999</Text>
+            <Text style={styles.footerContact}>📧 navodayasarthi.help@gmail.com</Text>
+            <Text style={styles.footerContact}>📞 +91 81759 47318</Text>
             <Text style={styles.footerContact}>💬 WhatsApp Support Available</Text>
           </View>
 
-          <View style={styles.footerSocial}>
-            <Text style={styles.footerLinkTitle}>Follow Us</Text>
-            <View style={styles.socialIcons}>
-              {['📘', '📸', '🐦', '📹'].map((icon) => (
-                <TouchableOpacity key={icon} style={styles.socialIcon}>
-                  <Text style={styles.socialIconText}>{icon}</Text>
-                </TouchableOpacity>
-              ))}
-            </View>
-          </View>
 
-          <View style={styles.footerBottom}>
-            <Text style={styles.footerCopyright}>© 2024 NavodayaSarthi. All rights reserved.</Text>
+<View style={styles.footerBottom}>
+            <Text style={styles.footerCopyright}>© 2026 NavodayaSarthi. All rights reserved.</Text>
             <Text style={styles.footerMadeWith}>Made with ❤️ in India for Indian Students</Text>
           </View>
         </View>
@@ -320,24 +300,7 @@ export default function LandingScreen({ navigation }) {
                   <Text style={styles.modalState}>📍 {selectedStory.state}</Text>
                   
                   <View style={styles.modalRankCard}>
-                    <Text style={styles.modalRank}>{selectedStory.rank}</Text>
                     <Text style={styles.modalYear}>JNVST {selectedStory.year}</Text>
-                  </View>
-
-                  <View style={styles.modalScores}>
-                    <Text style={styles.modalScoresTitle}>Subject-wise Performance</Text>
-                    <View style={styles.scoreRow}>
-                      <Text style={styles.scoreLabel}>Mental Ability:</Text>
-                      <Text style={styles.scoreValue}>{selectedStory.subjects.mental}/40</Text>
-                    </View>
-                    <View style={styles.scoreRow}>
-                      <Text style={styles.scoreLabel}>Arithmetic:</Text>
-                      <Text style={styles.scoreValue}>{selectedStory.subjects.arithmetic}/20</Text>
-                    </View>
-                    <View style={styles.scoreRow}>
-                      <Text style={styles.scoreLabel}>Language:</Text>
-                      <Text style={styles.scoreValue}>{selectedStory.subjects.language}/20</Text>
-                    </View>
                   </View>
 
                   <View style={styles.modalStory}>
@@ -371,6 +334,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
     paddingHorizontal: spacing.md, paddingVertical: spacing.sm,
   },
+  logoRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  logoImg: { width: 36, height: 36, borderRadius: 8, resizeMode: 'contain' },
   logo: { fontSize: typography.sizes.xl, fontWeight: typography.weights.extrabold, color: colors.white },
   logoSub: { fontSize: typography.sizes.sm, color: colors.accent, fontWeight: typography.weights.bold, marginTop: -4 },
   loginBtn: {
@@ -542,7 +507,9 @@ const styles = StyleSheet.create({
   
   // Footer
   footer: { backgroundColor: '#1A1A2E', padding: spacing.xl, paddingTop: spacing.xxl },
-  footerLogo: { fontSize: typography.sizes.xxl, fontWeight: typography.weights.extrabold, color: colors.white, textAlign: 'center' },
+  footerLogoRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm, marginBottom: spacing.xs },
+  footerLogoImg: { width: 40, height: 40, borderRadius: 8, resizeMode: 'contain' },
+  footerLogo: { fontSize: typography.sizes.xxl, fontWeight: typography.weights.extrabold, color: colors.white },
   footerTagline: { fontSize: typography.sizes.sm, color: '#B8B8C7', textAlign: 'center', marginTop: spacing.xs, marginBottom: spacing.lg },
   footerLinks: { marginBottom: spacing.lg },
   quickLinksRow: { flexDirection: 'row', justifyContent: 'space-between' },

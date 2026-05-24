@@ -18,6 +18,9 @@ export function QuestionCard({ question, selectedAnswer, onSelect, showResult = 
   return (
     <View style={styles.container}>
       <Text style={styles.questionText}>{question.text}</Text>
+      {question.textHi ? (
+        <Text style={styles.questionTextHi}>{question.textHi}</Text>
+      ) : null}
       {question.imageUrl ? (
         <Image
           source={{ uri: getFullImageUrl(question.imageUrl) }}
@@ -85,7 +88,14 @@ const styles = StyleSheet.create({
     fontWeight: typography.weights.semibold,
     color: colors.text,
     lineHeight: 26,
+    marginBottom: spacing.xs,
+  },
+  questionTextHi: {
+    fontSize: typography.sizes.md,
+    color: colors.textSecondary,
+    lineHeight: 24,
     marginBottom: spacing.md,
+    fontStyle: 'italic',
   },
   questionImage: {
     width: '100%',
