@@ -82,7 +82,7 @@ export function QuestionCard({ question, selectedAnswer, onSelect, showResult = 
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1 },
+  container: {},
   questionText: {
     fontSize: typography.sizes.lg,
     fontWeight: typography.weights.semibold,

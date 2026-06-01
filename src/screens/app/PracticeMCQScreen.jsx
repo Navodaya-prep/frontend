@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import {
-  View, Text, TouchableOpacity, StyleSheet, Alert, ScrollView,
+  View, Text, TouchableOpacity, StyleSheet, Alert, ScrollView, KeyboardAvoidingView, Platform,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useDispatch, useSelector } from 'react-redux';
@@ -29,7 +29,7 @@ const DIFF_COLORS = {
 //   OLD  (from Dashboard / legacy):    { chapterId }
 // ─────────────────────────────────────────────────────────────────────────────
 export default function PracticeMCQScreen({ navigation, route }) {
-  const { questions: paramQuestions, chapterId, chapterTitle } = route.params || {};
+  const { questions: paramQuestions, chapterId, chapterTitle, reviewMode = false } = route.params || {};
   const dispatch = useDispatch();
 
   // ── New-flow state (questions passed from ChapterDetail) ───────────────────
@@ -81,22 +81,9 @@ export default function PracticeMCQScreen({ navigation, route }) {
   }
 
   function handleSubmit() {
-    Alert.alert(
-      'Submit Practice',
-      `You answered ${answeredCount}/${total} questions. Submit now?`,
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Submit', onPress: () => {
-            if (isNewFlow && chapterId) {
-              // Build answers map { questionId: selectedIndex }
-              dispatch(submitChapterPractice({ chapterId, answers: hub.selectedAnswers }));
-            }
-            // Legacy: result is shown inline via QuestionCard after submit
-          },
-        },
-      ]
-    );
+    if (isNewFlow && chapterId) {
+      dispatch(submitChapterPractice({ chapterId, answers: hub.selectedAnswers }));
+    }
   }
 
   // ─────────────────────────────────────────────────────────────────────────
@@ -180,12 +167,7 @@ export default function PracticeMCQScreen({ navigation, route }) {
     <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => {
-          Alert.alert('Exit Practice', 'Progress will be lost. Exit?', [
-            { text: 'Cancel', style: 'cancel' },
-            { text: 'Exit', style: 'destructive', onPress: () => navigation.goBack() },
-          ]);
-        }} style={styles.exitWrap}>
+        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.exitWrap}>
           <Text style={styles.exitBtn}>✕</Text>
         </TouchableOpacity>
         <View style={styles.progressBarWrap}>
@@ -210,36 +192,39 @@ export default function PracticeMCQScreen({ navigation, route }) {
         </View>
       ) : null}
 
-      {/* Question */}
-      <View style={styles.body}>
+      {/* Question — scrollable so long passages don't clip */}
+      <ScrollView
+        style={styles.body}
+        contentContainerStyle={styles.bodyContent}
+        showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
+      >
         <QuestionCard
           question={currentQuestion}
           selectedAnswer={selectedForCurrent}
-          onSelect={handleSelect}
+          onSelect={reviewMode ? undefined : handleSelect}
+          showResult={reviewMode || selectedForCurrent !== undefined}
         />
-      </View>
+      </ScrollView>
 
       {/* Navigation */}
       <View style={styles.footer}>
-        <TouchableOpacity
-          style={[styles.navBtn, currentIndex === 0 && styles.navBtnDisabled]}
-          onPress={() => setCurrentIndex(currentIndex - 1)}
-          disabled={currentIndex === 0}
-        >
-          <Text style={styles.navBtnText}>← Prev</Text>
-        </TouchableOpacity>
-
-        {currentIndex === total - 1
-          ? <TouchableOpacity style={styles.submitBtn} onPress={handleSubmit}>
-              <Text style={styles.submitBtnText}>Submit →</Text>
-            </TouchableOpacity>
-          : <TouchableOpacity
-              style={styles.nextBtn}
-              onPress={() => setCurrentIndex(currentIndex + 1)}
-            >
-              <Text style={styles.nextBtnText}>Next →</Text>
-            </TouchableOpacity>
-        }
+        {currentIndex === total - 1 ? (
+          reviewMode
+            ? <TouchableOpacity style={[styles.actionBtn, styles.nextBtn]} onPress={() => navigation.goBack()}>
+                <Text style={styles.nextBtnText}>Done ✓</Text>
+              </TouchableOpacity>
+            : <TouchableOpacity style={[styles.actionBtn, styles.submitBtn]} onPress={handleSubmit}>
+                <Text style={styles.submitBtnText}>Finish →</Text>
+              </TouchableOpacity>
+        ) : (
+          <TouchableOpacity
+            style={[styles.actionBtn, styles.nextBtn]}
+            onPress={() => setCurrentIndex(currentIndex + 1)}
+          >
+            <Text style={styles.nextBtnText}>Next →</Text>
+          </TouchableOpacity>
+        )}
       </View>
     </SafeAreaView>
   );
@@ -268,28 +253,19 @@ const styles = StyleSheet.create({
   chapterLabel: { fontSize: typography.sizes.xs, color: colors.textSecondary, flex: 1 },
   diffBadge: { borderRadius: radius.full, paddingHorizontal: 8, paddingVertical: 3 },
   diffText: { fontSize: typography.sizes.xs, fontWeight: typography.weights.semibold },
-  body: { flex: 1, padding: spacing.md },
+  body: { flex: 1 },
+  bodyContent: { padding: spacing.md, paddingBottom: spacing.lg },
   footer: {
-    flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
     backgroundColor: colors.white, paddingHorizontal: spacing.md, paddingVertical: spacing.md,
     borderTopWidth: 1, borderTopColor: colors.border,
   },
-  navBtn: {
-    borderWidth: 2, borderColor: colors.primary, borderRadius: radius.md,
-    paddingVertical: 12, paddingHorizontal: spacing.lg,
+  actionBtn: {
+    borderRadius: radius.md, paddingVertical: 14, alignItems: 'center',
   },
-  navBtnDisabled: { borderColor: colors.border },
-  navBtnText: { color: colors.primary, fontWeight: typography.weights.bold },
-  nextBtn: {
-    backgroundColor: colors.primary, borderRadius: radius.md,
-    paddingVertical: 12, paddingHorizontal: spacing.lg,
-  },
-  nextBtnText: { color: colors.white, fontWeight: typography.weights.bold },
-  submitBtn: {
-    backgroundColor: colors.success, borderRadius: radius.md,
-    paddingVertical: 12, paddingHorizontal: spacing.lg,
-  },
-  submitBtnText: { color: colors.white, fontWeight: typography.weights.bold },
+  nextBtn: { backgroundColor: colors.primary },
+  nextBtnText: { color: colors.white, fontWeight: typography.weights.bold, fontSize: typography.sizes.md },
+  submitBtn: { backgroundColor: colors.success },
+  submitBtnText: { color: colors.white, fontWeight: typography.weights.bold, fontSize: typography.sizes.md },
   // Result styles
   resultScroll: { padding: spacing.md, gap: spacing.md, paddingBottom: 40 },
   scoreCard: {

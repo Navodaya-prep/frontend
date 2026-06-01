@@ -46,21 +46,23 @@ export default function PracticeChapterDetailScreen({ route, navigation }) {
     : activeTab === 'solved' ? solvedQuestions
     : pyqQuestions;
 
-  function startPractice(startingQuestions) {
+  function startPractice(startingQuestions, reviewMode = false) {
     if (startingQuestions.length === 0) return;
     navigation.navigate('PracticeMCQ', {
       questions: startingQuestions,
       chapterId: chapter.id,
       chapterTitle: chapter.title,
+      reviewMode,
     });
   }
 
   function renderQuestion({ item, index }) {
+    const isSolved = solvedSet.has(item.id);
     return (
       <TouchableOpacity
         style={styles.questionRow}
         activeOpacity={0.75}
-        onPress={() => startPractice([item])}
+        onPress={() => startPractice([item], isSolved)}
       >
         <View style={styles.questionNumWrap}>
           <Text style={styles.questionNum}>{index + 1}</Text>
@@ -169,7 +171,7 @@ export default function PracticeChapterDetailScreen({ route, navigation }) {
         <View style={[styles.ctaWrap, { paddingBottom: spacing.md + insets.bottom }]}>
           <TouchableOpacity
             style={[styles.ctaBtn, displayedQuestions.length === 0 && styles.ctaBtnDisabled]}
-            onPress={() => startPractice(displayedQuestions)}
+            onPress={() => startPractice(displayedQuestions, activeTab === 'solved')}
             disabled={displayedQuestions.length === 0}
           >
             <Text style={styles.ctaBtnText}>

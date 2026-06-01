@@ -72,7 +72,7 @@ export default function RootNavigator() {
             <Stack.Screen
               name="PracticeMCQ"
               component={PracticeMCQScreen}
-              options={{ presentation: 'modal' }}
+              options={{ presentation: 'card' }}
             />
 
             {/* Mock Test flow */}

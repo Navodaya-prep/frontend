@@ -4,7 +4,7 @@ import {
   ScrollView, Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { WebView } from 'react-native-webview';
+import YoutubePlayer from 'react-native-youtube-iframe';
 import { useDispatch, useSelector } from 'react-redux';
 import { markLessonComplete } from '../../store/recordedSlice';
 import { colors } from '../../theme/colors';
@@ -31,10 +31,25 @@ export default function LessonPlayerScreen({ route, navigation }) {
     }
   }
 
+  // Normalise stored value — may be a bare ID or a full URL (legacy data)
+  function extractYouTubeID(input = '') {
+    if (!input) return '';
+    if (!input.includes('/') && !input.includes('?')) return input;
+    const patterns = [
+      /[?&]v=([^&?/\s]+)/,
+      /youtu\.be\/([^?&/\s]+)/,
+      /\/embed\/([^?&/\s]+)/,
+      /\/shorts\/([^?&/\s]+)/,
+    ];
+    for (const re of patterns) {
+      const m = input.match(re);
+      if (m) return m[1];
+    }
+    return input;
+  }
+
   const isVideo = lesson.type === 'video';
-  const youtubeUri = isVideo && lesson.youtubeVideoId
-    ? `https://www.youtube.com/embed/${lesson.youtubeVideoId}?playsinline=1&rel=0&autoplay=1`
-    : null;
+  const videoId = extractYouTubeID(lesson.youtubeVideoId);
 
   return (
     <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
@@ -55,16 +70,12 @@ export default function LessonPlayerScreen({ route, navigation }) {
       </View>
 
       {/* Video Player */}
-      {isVideo && youtubeUri ? (
+      {isVideo && videoId ? (
         <View style={styles.playerWrap}>
-          <WebView
-            source={{ uri: youtubeUri }}
-            style={{ flex: 1 }}
-            allowsInlineMediaPlayback
-            allowsFullscreenVideo
-            mediaPlaybackRequiresUserAction={false}
-            javaScriptEnabled
-            originWhitelist={['*']}
+          <YoutubePlayer
+            height={220}
+            videoId={videoId}
+            play={true}
           />
         </View>
       ) : isVideo ? (
