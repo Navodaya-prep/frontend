@@ -25,7 +25,7 @@ export default function LoginScreen({ navigation }) {
     dispatch(clearError());
     const result = await dispatch(sendOtp(formatted));
     if (sendOtp.fulfilled.match(result)) {
-      navigation.navigate('OTPVerify', { phone: formatted, isLogin: true });
+      navigation.navigate('OTPVerify', { phone: formatted });
     }
   };
 

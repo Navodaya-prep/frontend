@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "257046236136",
+    "project_id": "navodaya-sarthi",
+    "storage_bucket": "navodaya-sarthi.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:257046236136:android:cd4eb62af5215bec91b25d",
+        "android_client_info": {
+          "package_name": "com.navodayasarthi.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDeXFAeLQpZp1EYSKmwLL6aJI_mVzzRIUw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
