@@ -9,10 +9,9 @@ export default function Footer({ navigation }) {
   return (
     <View style={styles.footer}>
       <View style={styles.footerLogoRow}>
-        <Image source={require('../../../assets/logo.jpg')} style={styles.footerLogoImg} />
+        <Image source={require('../../../assets/logo.png')} style={styles.footerLogoImg} />
         <Text style={styles.footerLogo}>NavodayaSarthi</Text>
       </View>
-      <Text style={styles.footerTagline}>India's JNVST Preparation Platform</Text>
       <View style={styles.divider} />
       <Text style={styles.footerContact}>📧 navodayasarthi.help@gmail.com</Text>
       <Text style={styles.footerContact}>📞 +91 81759 47318</Text>
@@ -42,7 +41,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   footerLogoRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm, marginBottom: spacing.xs },
-  footerLogoImg: { width: 40, height: 40, borderRadius: 8, resizeMode: 'contain' },
+  footerLogoImg: { width: 40, height: 40, borderRadius: 20, resizeMode: 'cover' },
   footerLogo: {
     fontSize: typography.sizes.xl,
     fontWeight: typography.weights.extrabold,

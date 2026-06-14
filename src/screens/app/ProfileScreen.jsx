@@ -15,6 +15,7 @@ const MENU_ITEMS = [
   { icon: '📊', titleKey: 'profile.myProgress', subKey: 'profile.myProgressSub', screen: 'Analytics' },
   { icon: '🌐', titleKey: 'profile.language', subKey: 'profile.languageSub', action: 'language' },
   { icon: '🔒', titleKey: 'profile.privacyPolicy', subKey: 'profile.privacyPolicySub', screen: 'PrivacyPolicy' },
+  { icon: '📋', titleKey: 'profile.termsOfService', subKey: 'profile.termsOfServiceSub', screen: 'Terms' },
   { icon: '📞', titleKey: 'profile.helpSupport', subKey: 'profile.helpSupportSub', screen: 'Doubts', tab: true },
 ];
 

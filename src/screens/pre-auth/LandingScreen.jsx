@@ -69,7 +69,7 @@ export default function LandingScreen({ navigation }) {
         <SafeAreaView style={styles.header}>
           <View style={styles.headerContent}>
             <View style={styles.logoRow}>
-              <Image source={require('../../../assets/logo.jpg')} style={styles.logoImg} />
+              <Image source={require('../../../assets/logo.png')} style={styles.logoImg} />
               <Text style={styles.logo}>NavodayaSarthi</Text>
             </View>
             <View style={styles.headerActions}>
@@ -85,9 +85,6 @@ export default function LandingScreen({ navigation }) {
 
         {/* Hero Section */}
         <View style={styles.hero}>
-          <View style={styles.heroBadge}>
-            <Text style={styles.heroBadgeText}>{t('landing.heroBadge')}</Text>
-          </View>
           <Text style={styles.heroTitle}>{t('landing.heroTitle')}</Text>
           <Text style={styles.heroSubtitle}>
             {t('landing.heroSubtitle')}
@@ -113,21 +110,28 @@ export default function LandingScreen({ navigation }) {
           </View>
         </View>
 
-        {/* Trust Indicators */}
-        <View style={styles.trustSection}>
-          <Text style={styles.trustTitle}>{t('landing.trustTitle')}</Text>
-          <View style={styles.trustGrid}>
-            {[
-              { icon: '🔒', text: t('landing.trustSafe'), sub: t('landing.trustSafeSub') },
-              { icon: '📱', text: t('landing.trustOffline'), sub: t('landing.trustOfflineSub') },
-            ].map((item) => (
-              <View key={item.text} style={styles.trustCard}>
-                <Text style={styles.trustIcon}>{item.icon}</Text>
-                <Text style={styles.trustText}>{item.text}</Text>
-                <Text style={styles.trustSub}>{item.sub}</Text>
-              </View>
+        {/* Success Stories */}
+        <View style={[styles.section, styles.successSection]}>
+          <Text style={[styles.sectionTitle, { color: colors.white }]}>{t('landing.successTitle')}</Text>
+          <Text style={styles.successSubtitle}>{t('landing.successSubtitle')}</Text>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.storiesScroll}>
+            {SUCCESS_STORIES.map((s) => (
+              <TouchableOpacity
+                key={s.name}
+                style={styles.storyCard}
+                onPress={() => setSelectedStory(s)}
+                activeOpacity={0.95}
+              >
+                <View style={styles.storyAvatar}>
+                  <Text style={styles.storyAvatarText}>{s.name[0]}</Text>
+                </View>
+                <Text style={styles.storyName}>{s.name}</Text>
+                <Text style={styles.storySchool}>{s.school}</Text>
+                <Text style={styles.storyYear}>{t('landing.classOf', { year: s.year })}</Text>
+                <Text style={styles.storyReadMore}>{t('landing.tapToRead')}</Text>
+              </TouchableOpacity>
             ))}
-          </View>
+          </ScrollView>
         </View>
 
         {/* Features */}
@@ -175,28 +179,21 @@ export default function LandingScreen({ navigation }) {
           ))}
         </View>
 
-        {/* Success Stories */}
-        <View style={[styles.section, styles.successSection]}>
-          <Text style={[styles.sectionTitle, { color: colors.white }]}>{t('landing.successTitle')}</Text>
-          <Text style={styles.successSubtitle}>{t('landing.successSubtitle')}</Text>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.storiesScroll}>
-            {SUCCESS_STORIES.map((s) => (
-              <TouchableOpacity 
-                key={s.name} 
-                style={styles.storyCard}
-                onPress={() => setSelectedStory(s)}
-                activeOpacity={0.9}
-              >
-                <View style={styles.storyAvatar}>
-                  <Text style={styles.storyAvatarText}>{s.name[0]}</Text>
-                </View>
-                <Text style={styles.storyName}>{s.name}</Text>
-                <Text style={styles.storySchool}>{s.school}</Text>
-                <Text style={styles.storyYear}>{t('landing.classOf', { year: s.year })}</Text>
-                <Text style={styles.storyReadMore}>{t('landing.tapToRead')}</Text>
-              </TouchableOpacity>
+        {/* Trust Indicators */}
+        <View style={styles.trustSection}>
+          <Text style={styles.trustTitle}>{t('landing.trustTitle')}</Text>
+          <View style={styles.trustGrid}>
+            {[
+              { icon: '🔒', text: t('landing.trustSafe'), sub: t('landing.trustSafeSub') },
+              { icon: '📱', text: t('landing.trustOffline'), sub: t('landing.trustOfflineSub') },
+            ].map((item) => (
+              <View key={item.text} style={styles.trustCard}>
+                <Text style={styles.trustIcon}>{item.icon}</Text>
+                <Text style={styles.trustText}>{item.text}</Text>
+                <Text style={styles.trustSub}>{item.sub}</Text>
+              </View>
             ))}
-          </ScrollView>
+          </View>
         </View>
 
         {/* Why Choose Us */}
@@ -243,11 +240,9 @@ export default function LandingScreen({ navigation }) {
         {/* Footer */}
         <View style={styles.footer}>
           <View style={styles.footerLogoRow}>
-            <Image source={require('../../../assets/logo.jpg')} style={styles.footerLogoImg} />
+            <Image source={require('../../../assets/logo.png')} style={styles.footerLogoImg} />
             <Text style={styles.footerLogo}>NavodayaSarthi</Text>
           </View>
-          <Text style={styles.footerTagline}>{t('landing.footerTagline')}</Text>
-
           <View style={styles.footerLinks}>
             <Text style={styles.footerLinkTitle}>{t('landing.quickLinks')}</Text>
             <View style={styles.quickLinksRow}>
@@ -349,7 +344,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.md, paddingVertical: spacing.sm,
   },
   logoRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  logoImg: { width: 36, height: 36, borderRadius: 8, resizeMode: 'contain' },
+  logoImg: { width: 36, height: 36, borderRadius: 18, resizeMode: 'cover' },
   logo: { fontSize: typography.sizes.xl, fontWeight: typography.weights.extrabold, color: colors.white },
   logoSub: { fontSize: typography.sizes.sm, color: colors.accent, fontWeight: typography.weights.bold, marginTop: -4 },
   headerActions: { flexDirection: 'row', alignItems: 'center', gap: spacing.xs },
@@ -366,7 +361,7 @@ const styles = StyleSheet.create({
   hero: {
     backgroundColor: colors.primary,
     paddingHorizontal: spacing.md,
-    paddingTop: spacing.lg,
+    paddingTop: 0,
     paddingBottom: spacing.xxl,
   },
   heroBadge: {
@@ -470,31 +465,34 @@ const styles = StyleSheet.create({
   stepDesc: { fontSize: typography.sizes.xs, color: colors.textSecondary, marginTop: 2 },
   
   // Success Stories
-  successSection: { backgroundColor: colors.primary, paddingBottom: spacing.lg },
-  successSubtitle: { color: '#B8D4FF', fontSize: typography.sizes.sm, marginBottom: spacing.md, textAlign: 'center' },
+  successSection: { backgroundColor: colors.accent, paddingBottom: spacing.lg },
+  successSubtitle: { color: 'rgba(255,255,255,0.85)', fontSize: typography.sizes.sm, marginBottom: spacing.md, textAlign: 'center' },
   storiesScroll: { paddingLeft: spacing.md },
   storyCard: {
-    backgroundColor: colors.primaryDark,
+    backgroundColor: colors.white,
     borderRadius: radius.lg,
     padding: spacing.md,
     alignItems: 'center',
     marginRight: spacing.md,
     width: 180,
-    borderWidth: 2,
-    borderColor: colors.accent + '30',
+    elevation: 4,
+    shadowColor: '#000',
+    shadowOpacity: 0.12,
+    shadowRadius: 6,
+    shadowOffset: { width: 0, height: 3 },
   },
   storyAvatar: {
     width: 64, height: 64, borderRadius: 32,
-    backgroundColor: colors.accent, alignItems: 'center', justifyContent: 'center', marginBottom: spacing.sm,
-    borderWidth: 3, borderColor: colors.white,
+    backgroundColor: colors.primary, alignItems: 'center', justifyContent: 'center', marginBottom: spacing.sm,
+    borderWidth: 3, borderColor: colors.accent,
   },
   storyAvatarText: { color: colors.white, fontWeight: typography.weights.extrabold, fontSize: typography.sizes.xxl },
-  storyName: { color: colors.white, fontWeight: typography.weights.bold, fontSize: typography.sizes.md, textAlign: 'center', marginBottom: 4 },
-  storySchool: { color: '#B8D4FF', fontSize: typography.sizes.xs, textAlign: 'center', marginBottom: spacing.sm },
+  storyName: { color: colors.primary, fontWeight: typography.weights.bold, fontSize: typography.sizes.md, textAlign: 'center', marginBottom: 4 },
+  storySchool: { color: colors.textSecondary, fontSize: typography.sizes.xs, textAlign: 'center', marginBottom: spacing.sm },
   storyRankBadge: { backgroundColor: colors.accent, borderRadius: radius.md, paddingHorizontal: spacing.sm, paddingVertical: 4, marginBottom: spacing.xs },
   storyRank: { color: colors.white, fontSize: typography.sizes.sm, fontWeight: typography.weights.extrabold },
-  storyYear: { color: '#B8D4FF', fontSize: typography.sizes.xs, marginBottom: spacing.sm },
-  storyReadMore: { color: colors.accent, fontSize: typography.sizes.xs, fontWeight: typography.weights.bold },
+  storyYear: { color: colors.textLight, fontSize: typography.sizes.xs, marginBottom: spacing.sm },
+  storyReadMore: { color: colors.primary, fontSize: typography.sizes.xs, fontWeight: typography.weights.bold },
   
   // Why Choose Us
   whyCard: { flexDirection: 'row', backgroundColor: colors.white, borderRadius: radius.lg, padding: spacing.md, marginBottom: spacing.sm, elevation: 1 },
@@ -528,7 +526,7 @@ const styles = StyleSheet.create({
   // Footer
   footer: { backgroundColor: '#1A1A2E', padding: spacing.xl, paddingTop: spacing.xxl },
   footerLogoRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm, marginBottom: spacing.xs },
-  footerLogoImg: { width: 40, height: 40, borderRadius: 8, resizeMode: 'contain' },
+  footerLogoImg: { width: 40, height: 40, borderRadius: 20, resizeMode: 'cover' },
   footerLogo: { fontSize: typography.sizes.xxl, fontWeight: typography.weights.extrabold, color: colors.white },
   footerTagline: { fontSize: typography.sizes.sm, color: '#B8B8C7', textAlign: 'center', marginTop: spacing.xs, marginBottom: spacing.lg },
   footerLinks: { marginBottom: spacing.lg },

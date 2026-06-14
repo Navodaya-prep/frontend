@@ -53,32 +53,44 @@ export default function PracticeChapterDetailScreen({ route, navigation }) {
     : activeTab === 'solved' ? solvedQuestions
     : pyqQuestions;
 
-  function startPractice(startingQuestions, reviewMode = false) {
-    // Never start a session with locked questions.
-    const playable = startingQuestions.filter((q) => !isLocked(q));
-    if (playable.length === 0) {
-      navigation.navigate('PremiumUpgrade');
-      return;
-    }
+  function openAtQuestion(item) {
+    if (isLocked(item)) { navigation.navigate('PremiumUpgrade'); return; }
+    const playable = displayedQuestions.filter((q) => !isLocked(q));
+    const startIndex = playable.findIndex((q) => q.id === item.id);
     navigation.navigate('PracticeMCQ', {
       questions: playable,
+      startIndex: Math.max(0, startIndex),
       chapterId: chapter.id,
       chapterTitle: pickLocalized(chapter, 'title'),
-      reviewMode,
+      reviewMode: activeTab === 'solved',
+    });
+  }
+
+  function openAll() {
+    const playable = displayedQuestions.filter((q) => !isLocked(q));
+    if (playable.length === 0) { navigation.navigate('PremiumUpgrade'); return; }
+    navigation.navigate('PracticeMCQ', {
+      questions: playable,
+      startIndex: 0,
+      chapterId: chapter.id,
+      chapterTitle: pickLocalized(chapter, 'title'),
+      reviewMode: activeTab === 'solved',
     });
   }
 
   function renderQuestion({ item, index }) {
-    const isSolved = solvedSet.has(item.id);
     const locked = isLocked(item);
+    const solved = solvedSet.has(item.id);
     return (
       <TouchableOpacity
         style={[styles.questionRow, locked && styles.questionRowLocked]}
         activeOpacity={0.75}
-        onPress={() => (locked ? navigation.navigate('PremiumUpgrade') : startPractice([item], isSolved))}
+        onPress={() => openAtQuestion(item)}
       >
-        <View style={styles.questionNumWrap}>
-          <Text style={styles.questionNum}>{index + 1}</Text>
+        <View style={[styles.questionNumWrap, solved && styles.questionNumWrapSolved]}>
+          <Text style={[styles.questionNum, solved && styles.questionNumSolved]}>
+            {solved ? '✓' : index + 1}
+          </Text>
         </View>
         <Text style={[styles.questionText, locked && styles.questionTextLocked]} numberOfLines={2}>
           {pickLocalized(item, 'text')}
@@ -188,7 +200,7 @@ export default function PracticeChapterDetailScreen({ route, navigation }) {
         <View style={[styles.ctaWrap, { paddingBottom: spacing.md + insets.bottom }]}>
           <TouchableOpacity
             style={[styles.ctaBtn, displayedQuestions.length === 0 && styles.ctaBtnDisabled]}
-            onPress={() => startPractice(displayedQuestions, activeTab === 'solved')}
+            onPress={openAll}
             disabled={displayedQuestions.length === 0}
           >
             <Text style={styles.ctaBtnText}>
@@ -248,6 +260,8 @@ const styles = StyleSheet.create({
     alignItems: 'center', justifyContent: 'center',
   },
   questionNum: { fontSize: typography.sizes.sm, fontWeight: typography.weights.bold, color: colors.primary },
+  questionNumWrapSolved: { backgroundColor: colors.successLight },
+  questionNumSolved: { color: colors.success },
   questionText: { flex: 1, fontSize: typography.sizes.sm, color: colors.text, lineHeight: 20 },
   questionRowLocked: { backgroundColor: colors.background, borderStyle: 'dashed' },
   questionTextLocked: { color: colors.textLight },

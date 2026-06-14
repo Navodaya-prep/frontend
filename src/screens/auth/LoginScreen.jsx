@@ -40,7 +40,7 @@ export default function LoginScreen({ navigation }) {
           </TouchableOpacity>
 
           <View style={styles.logoArea}>
-            <Image source={require('../../../assets/logo.jpg')} style={styles.logoImage} />
+            <Image source={require('../../../assets/logo.png')} style={styles.logoImage} />
             <Text style={styles.logoTitle}>NavodayaSarthi</Text>
             <Text style={styles.logoSub}>{t('auth.welcomeBack')}</Text>
           </View>
@@ -84,7 +84,7 @@ const styles = StyleSheet.create({
   backBtn: { marginBottom: spacing.lg },
   backText: { color: colors.primary, fontWeight: typography.weights.semibold, fontSize: typography.sizes.md },
   logoArea: { alignItems: 'center', marginBottom: spacing.xl },
-  logoImage: { width: 80, height: 80, borderRadius: 16, resizeMode: 'contain', marginBottom: spacing.sm },
+  logoImage: { width: 80, height: 80, borderRadius: 40, resizeMode: 'cover', marginBottom: spacing.sm },
   logoTitle: { fontSize: typography.sizes.xxl, fontWeight: typography.weights.extrabold, color: colors.primary },
   logoSub: { fontSize: typography.sizes.md, color: colors.textSecondary, marginTop: 4 },
   title: { fontSize: typography.sizes.xl, fontWeight: typography.weights.extrabold, color: colors.text, marginBottom: spacing.sm },

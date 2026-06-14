@@ -1,172 +1,79 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import {
-  View, Text, TouchableOpacity, StyleSheet, Alert, ScrollView, KeyboardAvoidingView, Platform,
+  View, Text, TouchableOpacity, StyleSheet, ScrollView,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useDispatch, useSelector } from 'react-redux';
-import {
-  selectAnswer, clearSession, submitChapterPractice,
-} from '../../store/practiceHubSlice';
-import {
-  fetchPracticeQuestions, selectAnswer as legacySelectAnswer,
-  setCurrentIndex as legacySetIndex, resetPractice,
-} from '../../store/practiceSlice';
+import { useDispatch } from 'react-redux';
+import { markQuestionSolved } from '../../store/practiceHubSlice';
+import { practiceHubApi } from '../../api/practiceHubApi';
 import { colors } from '../../theme/colors';
 import { typography } from '../../theme/typography';
 import { radius, spacing } from '../../theme/spacing';
-import { pickLocalized } from '../../utils/localize';
-import { AppLoader } from '../../components/common/AppLoader';
 import { QuestionCard } from '../../components/mcq/QuestionCard';
 
 const DIFF_COLORS = {
-  easy: colors.success, medium: colors.warning, hard: colors.error,
+  easy: colors.success,
+  medium: colors.warning,
+  hard: colors.error,
 };
 
-// ─────────────────────────────────────────────────────────────────────────────
-// PracticeMCQScreen
-//
-// Route params:
-//   NEW  (from PracticeChapterDetail): { questions, chapterId, chapterTitle }
-//   OLD  (from Dashboard / legacy):    { chapterId }
-// ─────────────────────────────────────────────────────────────────────────────
 export default function PracticeMCQScreen({ navigation, route }) {
-  const { questions: paramQuestions, chapterId, chapterTitle, reviewMode = false } = route.params || {};
+  const {
+    questions = [],
+    startIndex = 0,
+    chapterId,
+    chapterTitle,
+    reviewMode = false,
+  } = route.params || {};
+
   const dispatch = useDispatch();
 
-  // ── New-flow state (questions passed from ChapterDetail) ───────────────────
-  const hub = useSelector((s) => s.practiceHub);
-  const [hubIndex, setHubIndex] = useState(0);
-  const isNewFlow = Array.isArray(paramQuestions);
+  const [currentIndex, setCurrentIndex] = useState(startIndex);
+  const [selectedAnswers, setSelectedAnswers] = useState({});
+  const [revealed, setRevealed] = useState({});
 
-  // ── Legacy-flow state (questions fetched from API) ─────────────────────────
-  const { questions: apiQuestions, selectedAnswers: legacyAnswers,
-          currentIndex: legacyIndex, status, submitted: legacySubmitted, result: legacyResult,
-  } = useSelector((s) => s.practice);
-
-  useEffect(() => {
-    if (!isNewFlow && chapterId) {
-      dispatch(fetchPracticeQuestions(chapterId));
-    }
-    return () => {
-      if (isNewFlow) dispatch(clearSession());
-      else dispatch(resetPractice());
-    };
-  }, [chapterId]);
-
-  // ─────────────────────────────────────────────────────────────────────────
-  // Unified accessors
-  // ─────────────────────────────────────────────────────────────────────────
-  const questions = isNewFlow ? paramQuestions : apiQuestions;
-  const currentIndex = isNewFlow ? hubIndex : legacyIndex;
-  const setCurrentIndex = isNewFlow
-    ? setHubIndex
-    : (i) => dispatch(legacySetIndex(i));
-  const selectedAnswers = isNewFlow ? hub.selectedAnswers : legacyAnswers;
-  const result = isNewFlow ? hub.result : legacyResult;
-  const submitted = isNewFlow ? !!hub.result : legacySubmitted;
-
-  const currentQuestion = questions[currentIndex];
+  const question = questions[currentIndex];
   const total = questions.length;
-  const answeredCount = Object.keys(selectedAnswers).length;
 
-  // ─────────────────────────────────────────────────────────────────────────
-  // Handlers
-  // ─────────────────────────────────────────────────────────────────────────
+  if (!question) return null;
+
+  const selectedForCurrent = selectedAnswers[question.id];
+  const isRevealed = !!revealed[question.id] || reviewMode;
+
   function handleSelect(optionIndex) {
-    if (submitted) return;
-    if (isNewFlow) {
-      dispatch(selectAnswer({ questionId: currentQuestion.id, selectedIndex: optionIndex }));
-    } else {
-      dispatch(legacySelectAnswer({ questionIndex: currentIndex, optionIndex }));
-    }
+    if (isRevealed) return;
+    setSelectedAnswers((prev) => ({ ...prev, [question.id]: optionIndex }));
   }
 
   function handleSubmit() {
-    if (isNewFlow && chapterId) {
-      dispatch(submitChapterPractice({ chapterId, answers: hub.selectedAnswers }));
+    if (selectedForCurrent === undefined || isRevealed) return;
+    setRevealed((prev) => ({ ...prev, [question.id]: true }));
+    practiceHubApi
+      .submitChapterPractice(chapterId, { [question.id]: selectedForCurrent })
+      .then(() => dispatch(markQuestionSolved(question.id)))
+      .catch(() => {});
+  }
+
+  function handleNext() {
+    if (currentIndex < total - 1) {
+      setCurrentIndex(currentIndex + 1);
+    } else {
+      navigation.goBack();
     }
   }
 
-  // ─────────────────────────────────────────────────────────────────────────
-  // Result screen (shown after new-flow submit)
-  // ─────────────────────────────────────────────────────────────────────────
-  if (submitted && isNewFlow && result) {
-    return (
-      <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
-        <View style={styles.header}>
-          <TouchableOpacity onPress={() => navigation.goBack()} style={styles.exitWrap}>
-            <Text style={styles.exitBtn}>✕</Text>
-          </TouchableOpacity>
-          <Text style={styles.headerTitle}>Result</Text>
-          <View style={{ width: 36 }} />
-        </View>
-        <ScrollView contentContainerStyle={styles.resultScroll}>
-          {/* Score card */}
-          <View style={[styles.scoreCard, {
-            backgroundColor: result.percent >= 70 ? colors.successLight : colors.errorLight,
-          }]}>
-            <Text style={[styles.scorePercent, {
-              color: result.percent >= 70 ? colors.success : colors.error,
-            }]}>{result.percent}%</Text>
-            <Text style={styles.scoreDetail}>
-              {result.correct} / {result.total} correct
-            </Text>
-          </View>
-
-          {/* Detailed answers */}
-          {result.detailed?.map((item, i) => (
-            <View key={item.questionId} style={[
-              styles.resultItem,
-              { borderLeftColor: item.isCorrect ? colors.success : colors.error },
-            ]}>
-              <View style={styles.resultItemTop}>
-                <Text style={styles.resultQNum}>Q{i + 1}</Text>
-                <View style={[
-                  styles.resultBadge,
-                  { backgroundColor: item.isCorrect ? colors.successLight : colors.errorLight },
-                ]}>
-                  <Text style={{ color: item.isCorrect ? colors.success : colors.error, fontSize: 12, fontWeight: '600' }}>
-                    {item.isCorrect ? '✓ Correct' : '✗ Wrong'}
-                  </Text>
-                </View>
-                <View style={[styles.diffBadge, { backgroundColor: (DIFF_COLORS[item.difficulty] || colors.primary) + '20' }]}>
-                  <Text style={[styles.diffText, { color: DIFF_COLORS[item.difficulty] || colors.primary }]}>
-                    {item.difficulty}
-                  </Text>
-                </View>
-              </View>
-              <Text style={styles.resultQText}>{pickLocalized(item, 'text')}</Text>
-              {!item.isCorrect && item.explanation ? (
-                <Text style={styles.explanation}>💡 {item.explanation}</Text>
-              ) : null}
-            </View>
-          ))}
-
-          <TouchableOpacity style={styles.doneBtn} onPress={() => navigation.goBack()}>
-            <Text style={styles.doneBtnText}>Done →</Text>
-          </TouchableOpacity>
-        </ScrollView>
-      </SafeAreaView>
-    );
+  function handlePrev() {
+    if (currentIndex > 0) setCurrentIndex(currentIndex - 1);
   }
 
-  // ─────────────────────────────────────────────────────────────────────────
-  // Loading state (legacy fetch)
-  // ─────────────────────────────────────────────────────────────────────────
-  if (!isNewFlow && status === 'loading') return <AppLoader fullScreen />;
-
-  if (!currentQuestion) return null;
-
-  // ─────────────────────────────────────────────────────────────────────────
-  // Quiz view
-  // ─────────────────────────────────────────────────────────────────────────
-  const selectedForCurrent = isNewFlow
-    ? hub.selectedAnswers[currentQuestion?.id]
-    : legacyAnswers[currentIndex];
+  const diffColor = DIFF_COLORS[question.difficulty] || colors.primary;
+  const isFirst = currentIndex === 0;
+  const isLast = currentIndex === total - 1;
+  const showSubmit = !isRevealed && !reviewMode;
 
   return (
     <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
-      {/* Header */}
+      {/* Progress header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.exitWrap}>
           <Text style={styles.exitBtn}>✕</Text>
@@ -178,22 +85,18 @@ export default function PracticeMCQScreen({ navigation, route }) {
       </View>
 
       {/* Chapter + difficulty */}
-      {(chapterTitle || currentQuestion?.difficulty) ? (
-        <View style={styles.metaRow}>
-          {chapterTitle ? <Text style={styles.chapterLabel} numberOfLines={1}>{chapterTitle}</Text> : null}
-          {currentQuestion?.difficulty ? (
-            <View style={[styles.diffBadge, {
-              backgroundColor: (DIFF_COLORS[currentQuestion.difficulty] || colors.primary) + '20',
-            }]}>
-              <Text style={[styles.diffText, { color: DIFF_COLORS[currentQuestion.difficulty] || colors.primary }]}>
-                {currentQuestion.difficulty}
-              </Text>
-            </View>
-          ) : null}
-        </View>
-      ) : null}
+      <View style={styles.metaRow}>
+        {chapterTitle ? (
+          <Text style={styles.chapterLabel} numberOfLines={1}>{chapterTitle}</Text>
+        ) : null}
+        {question.difficulty ? (
+          <View style={[styles.diffBadge, { backgroundColor: diffColor + '20' }]}>
+            <Text style={[styles.diffText, { color: diffColor }]}>{question.difficulty}</Text>
+          </View>
+        ) : null}
+      </View>
 
-      {/* Question — scrollable so long passages don't clip */}
+      {/* Scrollable question area */}
       <ScrollView
         style={styles.body}
         contentContainerStyle={styles.bodyContent}
@@ -201,31 +104,44 @@ export default function PracticeMCQScreen({ navigation, route }) {
         keyboardShouldPersistTaps="handled"
       >
         <QuestionCard
-          question={currentQuestion}
+          question={question}
           selectedAnswer={selectedForCurrent}
-          onSelect={reviewMode ? undefined : handleSelect}
-          showResult={reviewMode || selectedForCurrent !== undefined}
+          onSelect={handleSelect}
+          showResult={isRevealed}
         />
       </ScrollView>
 
-      {/* Navigation */}
+      {/* Footer */}
       <View style={styles.footer}>
-        {currentIndex === total - 1 ? (
-          reviewMode
-            ? <TouchableOpacity style={[styles.actionBtn, styles.nextBtn]} onPress={() => navigation.goBack()}>
-                <Text style={styles.nextBtnText}>Done ✓</Text>
-              </TouchableOpacity>
-            : <TouchableOpacity style={[styles.actionBtn, styles.submitBtn]} onPress={handleSubmit}>
-                <Text style={styles.submitBtnText}>Finish →</Text>
-              </TouchableOpacity>
-        ) : (
+        <View style={styles.footerRow}>
+          {/* Prev */}
           <TouchableOpacity
-            style={[styles.actionBtn, styles.nextBtn]}
-            onPress={() => setCurrentIndex(currentIndex + 1)}
+            style={[styles.navBtn, isFirst && styles.navBtnDisabled]}
+            onPress={handlePrev}
+            disabled={isFirst}
           >
-            <Text style={styles.nextBtnText}>Next →</Text>
+            <Text style={[styles.navBtnText, isFirst && styles.navBtnTextDisabled]}>← Prev</Text>
           </TouchableOpacity>
-        )}
+
+          {/* Submit — only when unanswered and not review */}
+          {showSubmit && (
+            <TouchableOpacity
+              style={[
+                styles.submitBtn,
+                selectedForCurrent === undefined && styles.submitBtnDisabled,
+              ]}
+              onPress={handleSubmit}
+              disabled={selectedForCurrent === undefined}
+            >
+              <Text style={styles.submitBtnText}>Submit</Text>
+            </TouchableOpacity>
+          )}
+
+          {/* Next / Done */}
+          <TouchableOpacity style={styles.navBtn} onPress={handleNext}>
+            <Text style={styles.navBtnText}>{isLast ? 'Done ✓' : 'Next →'}</Text>
+          </TouchableOpacity>
+        </View>
       </View>
     </SafeAreaView>
   );
@@ -234,18 +150,20 @@ export default function PracticeMCQScreen({ navigation, route }) {
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: colors.background },
   header: {
-    flexDirection: 'row', alignItems: 'center',
+    flexDirection: 'row', alignItems: 'center', gap: spacing.sm,
     backgroundColor: colors.white, paddingHorizontal: spacing.md, paddingVertical: spacing.sm,
     borderBottomWidth: 1, borderBottomColor: colors.border,
   },
-  exitWrap: { width: 36 },
-  exitBtn: { fontSize: typography.sizes.lg, color: colors.textSecondary },
-  headerTitle: { flex: 1, textAlign: 'center', fontSize: typography.sizes.md, fontWeight: typography.weights.bold, color: colors.text },
+  exitWrap: { width: 32, alignItems: 'center' },
+  exitBtn: { fontSize: 18, color: colors.textSecondary },
   progressBarWrap: {
     flex: 1, height: 8, backgroundColor: colors.border, borderRadius: radius.full, overflow: 'hidden',
   },
   progressBar: { height: '100%', backgroundColor: colors.primary, borderRadius: radius.full },
-  counter: { marginLeft: spacing.sm, fontSize: typography.sizes.sm, fontWeight: typography.weights.bold, color: colors.primary, minWidth: 36, textAlign: 'right' },
+  counter: {
+    fontSize: typography.sizes.sm, fontWeight: typography.weights.bold,
+    color: colors.primary, minWidth: 40, textAlign: 'right',
+  },
   metaRow: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
     paddingHorizontal: spacing.md, paddingVertical: spacing.xs,
@@ -260,33 +178,18 @@ const styles = StyleSheet.create({
     backgroundColor: colors.white, paddingHorizontal: spacing.md, paddingVertical: spacing.md,
     borderTopWidth: 1, borderTopColor: colors.border,
   },
-  actionBtn: {
-    borderRadius: radius.md, paddingVertical: 14, alignItems: 'center',
+  footerRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
+  navBtn: {
+    flex: 1, borderRadius: radius.md, paddingVertical: 13,
+    alignItems: 'center', borderWidth: 2, borderColor: colors.primary,
   },
-  nextBtn: { backgroundColor: colors.primary },
-  nextBtnText: { color: colors.white, fontWeight: typography.weights.bold, fontSize: typography.sizes.md },
-  submitBtn: { backgroundColor: colors.success },
+  navBtnDisabled: { borderColor: colors.border },
+  navBtnText: { color: colors.primary, fontWeight: typography.weights.bold, fontSize: typography.sizes.sm },
+  navBtnTextDisabled: { color: colors.textLight },
+  submitBtn: {
+    flex: 2, backgroundColor: colors.primary, borderRadius: radius.md,
+    paddingVertical: 13, alignItems: 'center',
+  },
+  submitBtnDisabled: { backgroundColor: colors.border },
   submitBtnText: { color: colors.white, fontWeight: typography.weights.bold, fontSize: typography.sizes.md },
-  // Result styles
-  resultScroll: { padding: spacing.md, gap: spacing.md, paddingBottom: 40 },
-  scoreCard: {
-    borderRadius: radius.xl, padding: spacing.xl, alignItems: 'center',
-  },
-  scorePercent: { fontSize: typography.sizes.hero, fontWeight: typography.weights.extrabold },
-  scoreDetail: { fontSize: typography.sizes.md, color: colors.text, marginTop: spacing.xs },
-  resultItem: {
-    backgroundColor: colors.white, borderRadius: radius.md,
-    padding: spacing.md, borderLeftWidth: 4,
-    elevation: 1, shadowColor: '#000', shadowOpacity: 0.04, shadowRadius: 4, shadowOffset: { width: 0, height: 1 },
-  },
-  resultItemTop: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm, marginBottom: spacing.sm },
-  resultQNum: { fontSize: typography.sizes.xs, color: colors.textLight, fontWeight: typography.weights.semibold },
-  resultBadge: { borderRadius: radius.full, paddingHorizontal: 8, paddingVertical: 2 },
-  resultQText: { fontSize: typography.sizes.sm, color: colors.text, lineHeight: 20 },
-  explanation: { fontSize: typography.sizes.xs, color: colors.textSecondary, marginTop: spacing.sm, lineHeight: 18, fontStyle: 'italic' },
-  doneBtn: {
-    backgroundColor: colors.primary, borderRadius: radius.lg,
-    paddingVertical: 14, alignItems: 'center', marginTop: spacing.md,
-  },
-  doneBtnText: { color: '#fff', fontSize: typography.sizes.md, fontWeight: typography.weights.bold },
 });

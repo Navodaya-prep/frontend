@@ -1,9 +1,12 @@
 import { Platform } from 'react-native';
-import * as Notifications from 'expo-notifications';
 import { liveClassApi } from '../api/liveClassApi';
 
 export async function registerPushToken() {
   try {
+    // Dynamic require so Expo Go (which lacks the native module) doesn't crash
+    // at module load time. The try/catch handles the missing-module error.
+    const Notifications = require('expo-notifications');
+
     const { status: existing } = await Notifications.getPermissionsAsync();
     let finalStatus = existing;
 

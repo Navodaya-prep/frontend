@@ -3,7 +3,6 @@ import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Alert, ActivityIn
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import { useDispatch, useSelector } from 'react-redux';
-import RazorpayCheckout from 'react-native-razorpay';
 import { paymentApi } from '../../api/paymentApi';
 import { fetchProfile } from '../../store/authSlice';
 import { colors } from '../../theme/colors';
@@ -60,6 +59,7 @@ export default function PremiumUpgradeScreen({ navigation }) {
 
       let checkout;
       try {
+        const RazorpayCheckout = require('react-native-razorpay').default;
         checkout = await RazorpayCheckout.open(options);
       } catch (err) {
         // User dismissed the sheet or payment failed — not an app error.

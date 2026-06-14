@@ -67,6 +67,12 @@ const practiceHubSlice = createSlice({
       const { questionId, selectedIndex } = action.payload;
       state.selectedAnswers[questionId] = selectedIndex;
     },
+    markQuestionSolved(state, action) {
+      const id = action.payload;
+      if (!state.solvedIds.includes(id)) {
+        state.solvedIds = [...state.solvedIds, id];
+      }
+    },
     clearSession(state) {
       state.selectedAnswers = {};
       state.result = null;
@@ -127,5 +133,5 @@ const practiceHubSlice = createSlice({
   },
 });
 
-export const { selectAnswer, clearSession, clearChapters, clearQuestions } = practiceHubSlice.actions;
+export const { selectAnswer, markQuestionSolved, clearSession, clearChapters, clearQuestions } = practiceHubSlice.actions;
 export default practiceHubSlice.reducer;
