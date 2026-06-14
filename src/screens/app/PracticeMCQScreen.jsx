@@ -14,6 +14,7 @@ import {
 import { colors } from '../../theme/colors';
 import { typography } from '../../theme/typography';
 import { radius, spacing } from '../../theme/spacing';
+import { pickLocalized } from '../../utils/localize';
 import { AppLoader } from '../../components/common/AppLoader';
 import { QuestionCard } from '../../components/mcq/QuestionCard';
 
@@ -134,7 +135,7 @@ export default function PracticeMCQScreen({ navigation, route }) {
                   </Text>
                 </View>
               </View>
-              <Text style={styles.resultQText}>{item.text}</Text>
+              <Text style={styles.resultQText}>{pickLocalized(item, 'text')}</Text>
               {!item.isCorrect && item.explanation ? (
                 <Text style={styles.explanation}>💡 {item.explanation}</Text>
               ) : null}

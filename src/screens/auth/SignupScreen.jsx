@@ -5,6 +5,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useDispatch, useSelector } from 'react-redux';
+import { useTranslation } from 'react-i18next';
 import { signup, clearError } from '../../store/authSlice';
 import { isValidName } from '../../utils/validators';
 import { colors } from '../../theme/colors';
@@ -16,6 +17,7 @@ export default function SignupScreen({ navigation, route }) {
   const { phone } = route.params || {};
   const [name, setName] = useState('');
   const dispatch = useDispatch();
+  const { t } = useTranslation();
   const { status, error, tempToken } = useSelector((s) => s.auth);
 
   const handleSignup = () => {
@@ -31,20 +33,20 @@ export default function SignupScreen({ navigation, route }) {
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1 }}>
         <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
           <Text style={styles.emoji}>🎓</Text>
-          <Text style={styles.title}>Create Your Account</Text>
-          <Text style={styles.subtitle}>Almost there! Enter your name to get started.</Text>
+          <Text style={styles.title}>{t('auth.createAccount')}</Text>
+          <Text style={styles.subtitle}>{t('auth.signupSubtitle')}</Text>
 
-          <Text style={styles.label}>Full Name</Text>
+          <Text style={styles.label}>{t('auth.fullName')}</Text>
           <TextInput
             style={styles.input}
-            placeholder="Enter your full name"
+            placeholder={t('auth.enterNamePlaceholder')}
             placeholderTextColor={colors.textLight}
             value={name}
             onChangeText={setName}
             autoCapitalize="words"
           />
 
-          <Text style={styles.label}>Mobile Number</Text>
+          <Text style={styles.label}>{t('auth.mobileNumber')}</Text>
           <View style={[styles.input, styles.readOnly]}>
             <Text style={styles.readOnlyText}>+91 {phone}</Text>
           </View>
@@ -52,7 +54,7 @@ export default function SignupScreen({ navigation, route }) {
           {error && <Text style={styles.errorText}>{error}</Text>}
 
           <AppButton
-            title="Create Account →"
+            title={t('auth.createAccountBtn')}
             onPress={handleSignup}
             loading={status === 'loading'}
             disabled={!isValid}
@@ -60,13 +62,13 @@ export default function SignupScreen({ navigation, route }) {
           />
 
           <Text style={styles.terms}>
-            By signing up, you agree to our{' '}
+            {t('auth.termsPrefix')}{' '}
             <Text style={styles.link} onPress={() => navigation.navigate('Terms')}>
-              Terms of Service
+              {t('auth.termsOfService')}
             </Text>
-            {' '}and{' '}
+            {' '}{t('auth.and')}{' '}
             <Text style={styles.link} onPress={() => navigation.navigate('PrivacyPolicy')}>
-              Privacy Policy
+              {t('auth.privacyPolicy')}
             </Text>
             .
           </Text>

@@ -6,14 +6,22 @@ import { fetchCourses } from '../../store/courseSlice';
 import { colors } from '../../theme/colors';
 import { typography } from '../../theme/typography';
 import { radius, spacing } from '../../theme/spacing';
+import { pickLocalized } from '../../utils/localize';
 import { AppLoader } from '../../components/common/AppLoader';
 
 export default function CoursesScreen({ navigation }) {
   const dispatch = useDispatch();
   const { list, status } = useSelector((s) => s.courses);
+  const user = useSelector((s) => s.auth.user);
   const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => { dispatch(fetchCourses()); }, []);
+
+  // Premium courses are locked for non-premium students.
+  const openCourse = (course) => {
+    if (course.isPremium && !user?.isPremium) navigation.navigate('PremiumUpgrade');
+    else navigation.navigate('CourseDetail', { course });
+  };
 
   async function handleRefresh() {
     setRefreshing(true);
@@ -59,7 +67,7 @@ export default function CoursesScreen({ navigation }) {
             renderItem={({ item }) => (
               <TouchableOpacity
                 style={styles.courseCard}
-                onPress={() => navigation.navigate('CourseDetail', { course: item })}
+                onPress={() => openCourse(item)}
                 activeOpacity={0.8}
               >
                 <View style={styles.courseThumb}>
@@ -67,7 +75,7 @@ export default function CoursesScreen({ navigation }) {
                 </View>
                 <View style={styles.courseInfo}>
                   <View style={styles.courseTopRow}>
-                    <Text style={styles.courseTitle}>{item.title}</Text>
+                    <Text style={styles.courseTitle}>{pickLocalized(item, 'title')}</Text>
                     {item.isPremium && (
                       <View style={styles.premiumBadge}>
                         <Text style={styles.premiumText}>PRO</Text>

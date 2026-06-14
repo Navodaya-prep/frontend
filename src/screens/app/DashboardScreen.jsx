@@ -4,6 +4,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useDispatch, useSelector } from 'react-redux';
+import { useTranslation } from 'react-i18next';
 import { fetchMockTests } from '../../store/mockTestSlice';
 import { fetchCourses } from '../../store/courseSlice';
 import { fetchSubjects } from '../../store/practiceHubSlice';
@@ -12,14 +13,16 @@ import { fetchSettings } from '../../store/settingsSlice';
 import { colors } from '../../theme/colors';
 import { typography } from '../../theme/typography';
 import { radius, spacing } from '../../theme/spacing';
+import { pickLocalized } from '../../utils/localize';
 const BIG_FOUR = [
-  { id: 'recorded', icon: '🎥', title: 'Recorded Classes', subtitle: 'Learn at your pace', color: colors.primary, screen: 'RecordedClasses' },
-  { id: 'live', icon: '🔴', title: 'Live Classes', subtitle: 'Join now!', color: colors.error, live: true, tab: 'Live' },
-  { id: 'practice', icon: '📋', title: 'Practice Hub', subtitle: '1200+ MCQs', color: colors.accent, screen: 'PracticeSubjects' },
-  { id: 'mock', icon: '📊', title: 'Mock Tests', subtitle: 'Full-length exams', color: colors.success, screen: 'MockTestList' },
+  { id: 'recorded', icon: '🎥', titleKey: 'dashboard.recordedClasses', subKey: 'dashboard.recordedClassesSub', color: colors.primary, screen: 'RecordedClasses' },
+  { id: 'live', icon: '🔴', titleKey: 'dashboard.liveClasses', subKey: 'dashboard.liveClassesSub', color: colors.error, live: true, tab: 'Live' },
+  { id: 'practice', icon: '📋', titleKey: 'dashboard.practiceHub', subKey: 'dashboard.practiceHubSub', color: colors.accent, screen: 'PracticeSubjects' },
+  { id: 'mock', icon: '📊', titleKey: 'dashboard.mockTests', subKey: 'dashboard.mockTestsSub', color: colors.success, screen: 'MockTestList' },
 ];
 
 export default function DashboardScreen({ navigation }) {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const { user } = useSelector((s) => s.auth);
   const { tests } = useSelector((s) => s.mockTest);
@@ -66,21 +69,21 @@ export default function DashboardScreen({ navigation }) {
       >
         {/* Hero Banner — greeting, streak & exam countdown */}
         <View style={styles.heroBanner}>
-          <Text style={styles.heroGreeting}>Hello, {user?.name?.split(' ')[0] || 'Student'}! 👋</Text>
-          <Text style={styles.heroGreetingSub}>Ready to crack JNVST?</Text>
+          <Text style={styles.heroGreeting}>{t('dashboard.greeting', { name: user?.name?.split(' ')[0] || t('common.student') })}</Text>
+          <Text style={styles.heroGreetingSub}>{t('dashboard.greetingSub')}</Text>
           <View style={styles.heroBadgesRow}>
             <View style={styles.heroStreakBadge}>
               <Text style={styles.heroBadgeIcon}>🔥</Text>
               <View>
                 <Text style={styles.heroBadgeNum}>{user?.streak || 0}</Text>
-                <Text style={styles.heroBadgeLabel}>day streak</Text>
+                <Text style={styles.heroBadgeLabel}>{t('dashboard.dayStreak')}</Text>
               </View>
             </View>
             <View style={styles.heroCountdownBadge}>
               <Text style={styles.heroBadgeIcon}>📅</Text>
               <View>
                 <Text style={styles.heroBadgeNum}>{daysLeft !== null ? daysLeft : '—'}</Text>
-                <Text style={styles.heroBadgeLabel}>days left</Text>
+                <Text style={styles.heroBadgeLabel}>{t('dashboard.daysLeft')}</Text>
                 <Text style={styles.heroBadgeExamName}>{examName || 'JNVST 2026'}</Text>
               </View>
             </View>
@@ -88,7 +91,7 @@ export default function DashboardScreen({ navigation }) {
         </View>
 
         {/* Big Four Grid */}
-        <Text style={styles.sectionTitle}>Your Learning Hub</Text>
+        <Text style={styles.sectionTitle}>{t('dashboard.learningHub')}</Text>
         <View style={styles.bigFourGrid}>
           {BIG_FOUR.map((item) => (
             <TouchableOpacity
@@ -105,8 +108,8 @@ export default function DashboardScreen({ navigation }) {
                   </View>
                 )}
               </View>
-              <Text style={styles.bigFourTitle}>{item.title}</Text>
-              <Text style={styles.bigFourSub}>{item.subtitle}</Text>
+              <Text style={styles.bigFourTitle}>{t(item.titleKey)}</Text>
+              <Text style={styles.bigFourSub}>{t(item.subKey)}</Text>
             </TouchableOpacity>
           ))}
         </View>
@@ -114,7 +117,7 @@ export default function DashboardScreen({ navigation }) {
         {/* Solve by Subject */}
         {subjects.length > 0 && (
           <>
-            <Text style={styles.sectionTitle}>Solve Problems by Subject</Text>
+            <Text style={styles.sectionTitle}>{t('dashboard.solveBySubject')}</Text>
             <View style={styles.subjectList}>
               {subjects.map((subject) => {
                 const color = subject.color || colors.primary;
@@ -129,9 +132,9 @@ export default function DashboardScreen({ navigation }) {
                       <Text style={styles.subjectIcon}>{subject.icon || '📚'}</Text>
                     </View>
                     <View style={styles.subjectInfo}>
-                      <Text style={styles.subjectName}>{subject.name}</Text>
+                      <Text style={styles.subjectName}>{pickLocalized(subject, 'name')}</Text>
                       <Text style={styles.subjectDesc}>
-                        {subject.chapterCount ?? 0} chapters · {subject.questionCount ?? 0} questions
+                        {t('dashboard.chaptersQuestions', { chapters: subject.chapterCount ?? 0, questions: subject.questionCount ?? 0 })}
                       </Text>
                     </View>
                     <View style={[styles.subjectArrow, { backgroundColor: color }]}>
@@ -153,12 +156,12 @@ export default function DashboardScreen({ navigation }) {
           <View style={styles.challengeLeft}>
             <Text style={styles.challengeEmoji}>⚡</Text>
             <View>
-              <Text style={styles.challengeTitle}>Daily Challenge</Text>
-              <Text style={styles.challengeSub}>Solve today's question · Earn up to 150 pts</Text>
+              <Text style={styles.challengeTitle}>{t('dashboard.dailyChallenge')}</Text>
+              <Text style={styles.challengeSub}>{t('dashboard.dailyChallengeSub')}</Text>
             </View>
           </View>
           <View style={styles.challengeBtn}>
-            <Text style={styles.challengeBtnText}>Go!</Text>
+            <Text style={styles.challengeBtnText}>{t('dashboard.go')}</Text>
           </View>
         </TouchableOpacity>
 
@@ -166,8 +169,8 @@ export default function DashboardScreen({ navigation }) {
         <TouchableOpacity style={styles.leaderboardBanner} onPress={() => navigation.navigate('Leaderboard')}>
           <Text style={styles.leaderboardIcon}>🏆</Text>
           <View style={{ flex: 1 }}>
-            <Text style={styles.leaderboardTitle}>Challenge Leaderboard</Text>
-            <Text style={styles.leaderboardSub}>See how you rank today & this month</Text>
+            <Text style={styles.leaderboardTitle}>{t('dashboard.leaderboard')}</Text>
+            <Text style={styles.leaderboardSub}>{t('dashboard.leaderboardSub')}</Text>
           </View>
           <Text style={styles.leaderboardArrow}>→</Text>
         </TouchableOpacity>

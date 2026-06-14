@@ -10,6 +10,7 @@ import { AppLoader } from '../../components/common/AppLoader';
 import { colors } from '../../theme/colors';
 import { typography } from '../../theme/typography';
 import { spacing, radius } from '../../theme/spacing';
+import { pickLocalized } from '../../utils/localize';
 
 const DIFF_COLORS = { easy: colors.success, medium: colors.warning, hard: colors.error };
 
@@ -36,7 +37,7 @@ export default function PracticeChaptersScreen({ route, navigation }) {
         onPress={() => navigation.navigate('PracticeChapterDetail', { chapter: item, subject })}
       >
         <View style={styles.cardTop}>
-          <Text style={styles.chapterTitle} numberOfLines={2}>{item.title}</Text>
+          <Text style={styles.chapterTitle} numberOfLines={2}>{pickLocalized(item, 'title')}</Text>
           {isComplete && (
             <View style={styles.completeBadge}>
               <Text style={styles.completeBadgeText}>✓ Done</Text>
@@ -83,7 +84,7 @@ export default function PracticeChaptersScreen({ route, navigation }) {
         <View style={styles.headerCenter}>
           <Text style={styles.subjectIcon}>{subject.icon || '📚'}</Text>
           <View>
-            <Text style={styles.title}>{subject.name}</Text>
+            <Text style={styles.title}>{pickLocalized(subject, 'name')}</Text>
             <Text style={styles.subtitle}>{chapters.length} chapters</Text>
           </View>
         </View>

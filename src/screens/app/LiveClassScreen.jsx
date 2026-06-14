@@ -10,6 +10,7 @@ import QuizPopup from '../../components/live/QuizPopup';
 import { colors } from '../../theme/colors';
 import { typography } from '../../theme/typography';
 import { spacing, radius } from '../../theme/spacing';
+import { pickLocalized } from '../../utils/localize';
 import { WS_BASE_URL } from '../../config';
 
 const { height } = Dimensions.get('window');
@@ -93,7 +94,7 @@ export default function LiveClassScreen({ route, navigation }) {
           <Text style={styles.backText}>←</Text>
         </TouchableOpacity>
         <View style={{ flex: 1 }}>
-          <Text style={styles.classTitle} numberOfLines={1}>{classData.title}</Text>
+          <Text style={styles.classTitle} numberOfLines={1}>{pickLocalized(classData, 'title')}</Text>
           <Text style={styles.classMeta}>{classData.subject} · {classData.teacherName}</Text>
         </View>
         <View style={styles.statusRow}>

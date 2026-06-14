@@ -1,9 +1,11 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Image } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { colors } from '../../theme/colors';
 import { typography } from '../../theme/typography';
 import { radius, spacing } from '../../theme/spacing';
 import { API_BASE_URL } from '../../config';
+import { pickLocalized } from '../../utils/localize';
 
 const API_BASE = API_BASE_URL.replace('/api', '');
 const OPTION_LABELS = ['A', 'B', 'C', 'D'];
@@ -15,12 +17,10 @@ function getFullImageUrl(url) {
 }
 
 export function QuestionCard({ question, selectedAnswer, onSelect, showResult = false }) {
+  useTranslation(); // subscribe to language changes so pickLocalized re-evaluates on switch
   return (
     <View style={styles.container}>
-      <Text style={styles.questionText}>{question.text}</Text>
-      {question.textHi ? (
-        <Text style={styles.questionTextHi}>{question.textHi}</Text>
-      ) : null}
+      <Text style={styles.questionText}>{pickLocalized(question, 'text')}</Text>
       {question.imageUrl ? (
         <Image
           source={{ uri: getFullImageUrl(question.imageUrl) }}

@@ -1,12 +1,12 @@
-import { useEffect } from 'react';
-import { Platform } from 'react-native';
+import { useEffect, useState } from 'react';
 import { Provider } from 'react-redux';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import * as Notifications from 'expo-notifications';
 import { store } from './src/store';
 import RootNavigator from './src/navigation/RootNavigator';
-import { liveClassApi } from './src/api/liveClassApi';
 import { storage } from './src/utils/storage';
+import { registerPushToken } from './src/utils/registerPushToken';
+import i18n from './src/i18n';
 
 // Show notifications while app is in foreground
 Notifications.setNotificationHandler({
@@ -17,31 +17,21 @@ Notifications.setNotificationHandler({
   }),
 });
 
-async function registerForPushNotifications() {
-  const { status: existing } = await Notifications.getPermissionsAsync();
-  let finalStatus = existing;
-
-  if (existing !== 'granted') {
-    const { status } = await Notifications.requestPermissionsAsync();
-    finalStatus = status;
-  }
-
-  if (finalStatus !== 'granted') return;
-
-  const token = await Notifications.getExpoPushTokenAsync();
-  const platform = Platform.OS;
-
-  // Only send if logged in
-  const authToken = await storage.getToken();
-  if (authToken && token?.data) {
-    liveClassApi.registerPushToken(token.data, platform).catch(() => {});
-  }
-}
-
 export default function App() {
+  const [langReady, setLangReady] = useState(false);
+
   useEffect(() => {
-    registerForPushNotifications();
+    // Load saved language before rendering anything, so there is no flash of
+    // English when the user has chosen Hindi.
+    storage.getLanguage()
+      .then(lang => { if (lang && lang !== i18n.language) return i18n.changeLanguage(lang); })
+      .finally(() => setLangReady(true));
+
+    // Register push token if already logged in.
+    storage.getToken().then(token => { if (token) registerPushToken(); });
   }, []);
+
+  if (!langReady) return null;
 
   return (
     <SafeAreaProvider>

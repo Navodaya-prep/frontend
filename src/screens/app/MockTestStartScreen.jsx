@@ -2,25 +2,20 @@ import React from 'react';
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useDispatch, useSelector } from 'react-redux';
+import { useTranslation } from 'react-i18next';
 import { startMockTest, resetMockTest } from '../../store/mockTestSlice';
 import { colors } from '../../theme/colors';
 import { typography } from '../../theme/typography';
 import { radius, spacing } from '../../theme/spacing';
+import { pickLocalized } from '../../utils/localize';
 import { AppLoader } from '../../components/common/AppLoader';
 
-const RULES = [
-  'The timer starts as soon as you tap "Start Test".',
-  'The test will auto-submit when time runs out.',
-  'You can navigate between questions using the number grid.',
-  'Answered questions are highlighted in green.',
-  'You can change your answer anytime before submitting.',
-  'Each correct answer carries 1 mark. No negative marking.',
-  'Do not exit the app during the test.',
-];
+const RULE_KEYS = ['rule1', 'rule2', 'rule3', 'rule4', 'rule5', 'rule6', 'rule7'];
 
 export default function MockTestStartScreen({ navigation, route }) {
   const { test } = route.params;
   const dispatch = useDispatch();
+  const { t } = useTranslation();
   const { status } = useSelector((s) => s.mockTest);
 
   const questionCount = test.questionCount || (test.questions?.length) || '—';
@@ -42,39 +37,37 @@ export default function MockTestStartScreen({ navigation, route }) {
     <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Text style={styles.back}>← Back</Text>
+          <Text style={styles.back}>{t('common.back')}</Text>
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Test Details</Text>
+        <Text style={styles.headerTitle}>{t('mockTest.testDetails')}</Text>
         <View style={{ width: 60 }} />
       </View>
 
       <ScrollView showsVerticalScrollIndicator={false}>
         {/* Test Info Card */}
         <View style={styles.infoCard}>
-          <Text style={styles.testTitle}>{test.title}</Text>
+          <Text style={styles.testTitle}>{pickLocalized(test, 'title')}</Text>
 
           {isRetest && (
             <View style={styles.retestBanner}>
-              <Text style={styles.retestBannerText}>
-                🔄 You have already attempted this test. This will be a new attempt.
-              </Text>
+              <Text style={styles.retestBannerText}>{t('mockTest.retestBanner')}</Text>
             </View>
           )}
 
           <View style={styles.statsGrid}>
             <View style={styles.statBox}>
               <Text style={styles.statValue}>{questionCount}</Text>
-              <Text style={styles.statLabel}>Questions</Text>
+              <Text style={styles.statLabel}>{t('mockTest.questions')}</Text>
             </View>
             <View style={styles.statDivider} />
             <View style={styles.statBox}>
               <Text style={styles.statValue}>{test.duration}</Text>
-              <Text style={styles.statLabel}>Minutes</Text>
+              <Text style={styles.statLabel}>{t('mockTest.minutes')}</Text>
             </View>
             <View style={styles.statDivider} />
             <View style={styles.statBox}>
               <Text style={styles.statValue}>{questionCount}</Text>
-              <Text style={styles.statLabel}>Max Marks</Text>
+              <Text style={styles.statLabel}>{t('mockTest.maxMarks')}</Text>
             </View>
           </View>
         </View>
@@ -82,7 +75,7 @@ export default function MockTestStartScreen({ navigation, route }) {
         {/* Previous Score */}
         {isRetest && test.latestAttempt && (
           <View style={styles.prevAttempt}>
-            <Text style={styles.prevTitle}>Your Previous Score</Text>
+            <Text style={styles.prevTitle}>{t('mockTest.prevScore')}</Text>
             <View style={styles.prevScoreRow}>
               <Text style={styles.prevScore}>
                 {test.latestAttempt.score}/{test.latestAttempt.totalMarks}
@@ -96,13 +89,13 @@ export default function MockTestStartScreen({ navigation, route }) {
 
         {/* Rules */}
         <View style={styles.rulesSection}>
-          <Text style={styles.rulesTitle}>📋 Instructions</Text>
-          {RULES.map((rule, i) => (
-            <View key={i} style={styles.ruleItem}>
+          <Text style={styles.rulesTitle}>{t('mockTest.instructions')}</Text>
+          {RULE_KEYS.map((key, i) => (
+            <View key={key} style={styles.ruleItem}>
               <View style={styles.ruleBullet}>
                 <Text style={styles.ruleBulletText}>{i + 1}</Text>
               </View>
-              <Text style={styles.ruleText}>{rule}</Text>
+              <Text style={styles.ruleText}>{t(`mockTest.${key}`)}</Text>
             </View>
           ))}
         </View>
@@ -111,11 +104,11 @@ export default function MockTestStartScreen({ navigation, route }) {
         <View style={styles.footer}>
           <TouchableOpacity style={styles.startBtn} onPress={handleStart} activeOpacity={0.85}>
             <Text style={styles.startBtnText}>
-              {isRetest ? '🔄 Start Retest' : '🚀 Start Test'}
+              {isRetest ? t('mockTest.startRetest') : t('mockTest.startTest')}
             </Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.cancelBtn} onPress={() => navigation.goBack()}>
-            <Text style={styles.cancelBtnText}>Cancel</Text>
+            <Text style={styles.cancelBtnText}>{t('common.cancel')}</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>

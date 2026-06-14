@@ -5,11 +5,13 @@ import {
 } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useDispatch, useSelector } from 'react-redux';
+import { useTranslation } from 'react-i18next';
 import { fetchChapterQuestions, clearQuestions } from '../../store/practiceHubSlice';
 import { AppLoader } from '../../components/common/AppLoader';
 import { colors } from '../../theme/colors';
 import { typography } from '../../theme/typography';
 import { spacing, radius } from '../../theme/spacing';
+import { pickLocalized } from '../../utils/localize';
 
 const DIFFICULTY_CONFIG = {
   easy:   { label: 'Easy',   bg: colors.successLight, text: colors.success },
@@ -30,13 +32,18 @@ export default function PracticeChapterDetailScreen({ route, navigation }) {
   const { chapter, subject } = route.params;
   const dispatch = useDispatch();
   const insets = useSafeAreaInsets();
+  const { t } = useTranslation();
   const { questions, solvedIds, loading, error } = useSelector((s) => s.practiceHub);
+  const user = useSelector((s) => s.auth.user);
   const [activeTab, setActiveTab] = useState('open'); // 'open' | 'solved' | 'pyq'
 
   useEffect(() => {
     dispatch(fetchChapterQuestions(chapter.id));
     return () => dispatch(clearQuestions());
   }, [chapter.id]);
+
+  // A question is locked when it's premium and the student isn't premium.
+  const isLocked = (q) => q.isPremium && !user?.isPremium;
 
   const solvedSet = new Set(solvedIds);
   const openQuestions = questions.filter((q) => !solvedSet.has(q.id));
@@ -47,28 +54,38 @@ export default function PracticeChapterDetailScreen({ route, navigation }) {
     : pyqQuestions;
 
   function startPractice(startingQuestions, reviewMode = false) {
-    if (startingQuestions.length === 0) return;
+    // Never start a session with locked questions.
+    const playable = startingQuestions.filter((q) => !isLocked(q));
+    if (playable.length === 0) {
+      navigation.navigate('PremiumUpgrade');
+      return;
+    }
     navigation.navigate('PracticeMCQ', {
-      questions: startingQuestions,
+      questions: playable,
       chapterId: chapter.id,
-      chapterTitle: chapter.title,
+      chapterTitle: pickLocalized(chapter, 'title'),
       reviewMode,
     });
   }
 
   function renderQuestion({ item, index }) {
     const isSolved = solvedSet.has(item.id);
+    const locked = isLocked(item);
     return (
       <TouchableOpacity
-        style={styles.questionRow}
+        style={[styles.questionRow, locked && styles.questionRowLocked]}
         activeOpacity={0.75}
-        onPress={() => startPractice([item], isSolved)}
+        onPress={() => (locked ? navigation.navigate('PremiumUpgrade') : startPractice([item], isSolved))}
       >
         <View style={styles.questionNumWrap}>
           <Text style={styles.questionNum}>{index + 1}</Text>
         </View>
-        <Text style={styles.questionText} numberOfLines={2}>{item.text}</Text>
-        <DiffBadge difficulty={item.difficulty} />
+        <Text style={[styles.questionText, locked && styles.questionTextLocked]} numberOfLines={2}>
+          {pickLocalized(item, 'text')}
+        </Text>
+        {locked
+          ? <View style={styles.lockBadge}><Text style={styles.lockBadgeText}>🔒 {t('premium.locked')}</Text></View>
+          : <DiffBadge difficulty={item.difficulty} />}
       </TouchableOpacity>
     );
   }
@@ -81,8 +98,8 @@ export default function PracticeChapterDetailScreen({ route, navigation }) {
           <Text style={styles.backText}>←</Text>
         </TouchableOpacity>
         <View style={{ flex: 1 }}>
-          <Text style={styles.title} numberOfLines={1}>{chapter.title}</Text>
-          <Text style={styles.subtitle}>{subject?.name}</Text>
+          <Text style={styles.title} numberOfLines={1}>{pickLocalized(chapter, 'title')}</Text>
+          <Text style={styles.subtitle}>{pickLocalized(subject, 'name')}</Text>
         </View>
       </View>
 
@@ -232,6 +249,13 @@ const styles = StyleSheet.create({
   },
   questionNum: { fontSize: typography.sizes.sm, fontWeight: typography.weights.bold, color: colors.primary },
   questionText: { flex: 1, fontSize: typography.sizes.sm, color: colors.text, lineHeight: 20 },
+  questionRowLocked: { backgroundColor: colors.background, borderStyle: 'dashed' },
+  questionTextLocked: { color: colors.textLight },
+  lockBadge: {
+    borderRadius: radius.full, paddingHorizontal: 8, paddingVertical: 3,
+    backgroundColor: colors.accent + '22',
+  },
+  lockBadgeText: { fontSize: typography.sizes.xs, fontWeight: typography.weights.semibold, color: colors.accent },
   diffBadge: { borderRadius: radius.full, paddingHorizontal: 8, paddingVertical: 3 },
   diffText: { fontSize: typography.sizes.xs, fontWeight: typography.weights.semibold },
   error: { color: colors.error, textAlign: 'center', padding: spacing.md },

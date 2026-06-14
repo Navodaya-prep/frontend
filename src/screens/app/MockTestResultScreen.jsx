@@ -1,29 +1,69 @@
 import React, { useState } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Alert, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { resetMockTest } from '../../store/mockTestSlice';
 import { colors } from '../../theme/colors';
 import { typography } from '../../theme/typography';
 import { radius, spacing } from '../../theme/spacing';
+import { pickLocalized } from '../../utils/localize';
 import { formatTime, getGrade } from '../../utils/formatters';
 import { QuestionCard } from '../../components/mcq/QuestionCard';
+import { mockTestApi } from '../../api/mockTestApi';
 
 export default function MockTestResultScreen({ navigation, route }) {
   const { test, result, questions = [], fromHistory = false } = route.params || {};
   const dispatch = useDispatch();
+  const user = useSelector((s) => s.auth.user);
   const [reviewMode, setReviewMode] = useState(false);
+  const [loadedResult, setLoadedResult] = useState(null);
+  const [detailLoading, setDetailLoading] = useState(false);
 
-  const correct = result?.correct ?? 0;
-  const wrong = result?.wrong ?? 0;
-  const skipped = result?.skipped ?? (questions.length - correct - wrong);
+  // The numbers come from two sources with different shapes:
+  //  • fresh submit response → has correct / wrong / skipped / percent
+  //  • a stored attempt (history) → has score, totalMarks, and an answers[] array
+  // Derive a consistent breakdown that works for both.
+  const answers = Array.isArray(result?.answers) ? result.answers : [];
   const total = result?.totalMarks ?? questions.length;
+  const correct = result?.correct ?? result?.score ?? answers.filter((a) => a.isCorrect).length;
+
+  let wrong;
+  let skipped;
+  if (result?.wrong != null || result?.skipped != null) {
+    wrong = result.wrong ?? 0;
+    skipped = result.skipped ?? Math.max(total - correct - wrong, 0);
+  } else if (answers.length > 0) {
+    const answered = answers.filter((a) => a.selectedIndex != null && a.selectedIndex !== -1).length;
+    wrong = Math.max(answered - correct, 0);
+    skipped = Math.max(total - answered, 0);
+  } else {
+    wrong = Math.max(total - correct, 0);
+    skipped = 0;
+  }
+
   const percent = result?.percent ?? (total > 0 ? Math.round((correct / total) * 100) : 0);
   const timeTaken = result?.timeTaken ?? 0;
   const grade = getGrade(percent);
 
-  // Detailed answers from API response (includes question text/options/explanation)
-  const detailedAnswers = result?.detailed || [];
+  // Detailed answers: prefer freshly-fetched (history), fall back to submit response
+  const detailedAnswers = (loadedResult || result)?.detailed || [];
+
+  const handleReviewToggle = async () => {
+    if (!reviewMode && fromHistory && !loadedResult) {
+      setDetailLoading(true);
+      try {
+        const res = await mockTestApi.getAttemptDetails(result.id || result._id);
+        setLoadedResult(res.data?.result || res.data);
+        setReviewMode(true);
+      } catch {
+        Alert.alert('Error', 'Failed to load review. Please try again.');
+      } finally {
+        setDetailLoading(false);
+      }
+    } else {
+      setReviewMode(!reviewMode);
+    }
+  };
 
   const handleGoHome = () => {
     dispatch(resetMockTest());
@@ -32,7 +72,8 @@ export default function MockTestResultScreen({ navigation, route }) {
 
   const handleRetest = () => {
     dispatch(resetMockTest());
-    navigation.navigate('MockTestStart', { test });
+    if (test?.isPremium && !user?.isPremium) navigation.navigate('PremiumUpgrade');
+    else navigation.navigate('MockTestStart', { test });
   };
 
   return (
@@ -44,7 +85,7 @@ export default function MockTestResultScreen({ navigation, route }) {
           <Text style={styles.emoji}>
             {percent >= 80 ? '🏆' : percent >= 60 ? '⭐' : percent >= 40 ? '💪' : '📖'}
           </Text>
-          <Text style={styles.testTitle} numberOfLines={2}>{test?.title}</Text>
+          <Text style={styles.testTitle} numberOfLines={2}>{pickLocalized(test, 'title')}</Text>
           <Text style={[styles.gradeLabel, { color: grade.color }]}>{grade.label}</Text>
           <Text style={styles.percentBig}>{percent}%</Text>
           <Text style={styles.scoreDetail}>{correct} correct out of {total}</Text>
@@ -87,16 +128,19 @@ export default function MockTestResultScreen({ navigation, route }) {
 
         {/* Action Buttons */}
         <View style={styles.actions}>
-          {detailedAnswers.length > 0 && (
-            <TouchableOpacity
-              style={[styles.actionBtn, styles.reviewBtn]}
-              onPress={() => setReviewMode(!reviewMode)}
-            >
+          <TouchableOpacity
+            style={[styles.actionBtn, styles.reviewBtn]}
+            onPress={handleReviewToggle}
+            disabled={detailLoading}
+          >
+            {detailLoading ? (
+              <ActivityIndicator color={colors.primary} />
+            ) : (
               <Text style={styles.reviewBtnText}>
                 {reviewMode ? '▲ Hide Review' : '🔍 Review Answers'}
               </Text>
-            </TouchableOpacity>
-          )}
+            )}
+          </TouchableOpacity>
 
           {!fromHistory && (
             <TouchableOpacity style={[styles.actionBtn, styles.retestBtn]} onPress={handleRetest}>
@@ -132,11 +176,12 @@ export default function MockTestResultScreen({ navigation, route }) {
                 <QuestionCard
                   question={{
                     text: d.text,
+                    textHi: d.textHi,
                     options: d.options,
-                    correctIndex: d.correctIdx,
+                    correctIndex: d.correctIndex,
                     explanation: d.explanation,
                   }}
-                  selectedAnswer={d.selectedIdx}
+                  selectedAnswer={d.selectedIndex}
                   showResult
                   onSelect={() => {}}
                 />

@@ -2,6 +2,7 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { authApi } from '../api/authApi';
 import { profileApi } from '../api/profileApi';
 import { storage } from '../utils/storage';
+import { registerPushToken } from '../utils/registerPushToken';
 
 export const sendOtp = createAsyncThunk('auth/sendOtp', async (phone, { rejectWithValue }) => {
   try {
@@ -21,6 +22,7 @@ export const verifyOtp = createAsyncThunk('auth/verifyOtp', async ({ phone, otp 
     if (res.data.token) {
       await storage.setToken(res.data.token);
       await storage.setUser(res.data.user);
+      registerPushToken(); // register now that we have an auth token
     }
     return res.data;
   } catch (err) {
@@ -33,6 +35,7 @@ export const signup = createAsyncThunk('auth/signup', async (payload, { rejectWi
     const res = await authApi.signup(payload);
     await storage.setToken(res.data.token);
     await storage.setUser(res.data.user);
+    registerPushToken(); // register now that we have an auth token
     return res.data;
   } catch (err) {
     return rejectWithValue(err.response?.data?.message || 'Signup failed');

@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useTranslation } from 'react-i18next';
 import { colors } from '../../theme/colors';
 import { typography } from '../../theme/typography';
 import { radius, spacing } from '../../theme/spacing';
@@ -10,49 +11,43 @@ const AVATAR_COLORS = ['#E53935', '#8E24AA', '#1E88E5', '#00897B', '#F4511E', '#
 const getAvatarColor = (name) => AVATAR_COLORS[name.charCodeAt(0) % AVATAR_COLORS.length];
 
 const TEAM = [
-  { name: 'Deepak Kumar', role: 'Co-Founder · Alumni of Navodaya', exp: 'Building India\'s best JNVST platform' },
-  { name: 'Vikram Kumar', role: 'Co-Founder · Alumni of Navodaya', exp: 'Building India\'s best JNVST platform' },
-  { name: 'DK Gaur', role: 'Math Expert', exp: '20 years experience' },
-  { name: 'Suraj Yadav', role: 'Co-Founder · Reasoning Expert', exp: '5 years experience' },
-  { name: 'Rahul Kumar', role: 'Language Expert · Alumni of Navodaya', exp: '3 years experience' },
+  { name: 'Deepak Kumar', roleKey: 'about.roleCoFounderAlumni', expKey: 'about.expBuilding' },
+  { name: 'Vikram Kumar', roleKey: 'about.roleCoFounderAlumni', expKey: 'about.expBuilding' },
+  { name: 'DK Gaur', roleKey: 'about.roleMathExpert', expKey: 'about.exp20' },
+  { name: 'Suraj Yadav', roleKey: 'about.roleCoFounderReasoning', expKey: 'about.exp5' },
+  { name: 'Rahul Kumar', roleKey: 'about.roleLanguageAlumni', expKey: 'about.exp3' },
 ];
 
 export default function AboutScreen({ navigation }) {
+  const { t } = useTranslation();
   return (
     <SafeAreaView style={styles.safe}>
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Text style={styles.back}>← Back</Text>
+          <Text style={styles.back}>{t('common.back')}</Text>
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>About Us</Text>
+        <Text style={styles.headerTitle}>{t('about.title')}</Text>
         <View style={{ width: 60 }} />
       </View>
       <ScrollView showsVerticalScrollIndicator={false}>
         {/* Story */}
         <View style={styles.heroSection}>
           <Text style={styles.heroEmoji}>🏫</Text>
-          <Text style={styles.heroTitle}>Our Story</Text>
-          <Text style={styles.heroText}>
-            NavodayaSarthi was born from a simple belief — every child in rural India deserves a chance at world-class education.
-            The Jawahar Navodaya Vidyalaya system provides exactly that, but the path to getting in has always been tough for students without access to quality coaching.
-          </Text>
-          <Text style={styles.heroText}>
-            We built this app to bridge that gap. Our team of expert educators work tirelessly to create content that is simple, effective, and accessible — even on slow 2G connections.
-          </Text>
+          <Text style={styles.heroTitle}>{t('about.storyTitle')}</Text>
+          <Text style={styles.heroText}>{t('about.storyP1')}</Text>
+          <Text style={styles.heroText}>{t('about.storyP2')}</Text>
         </View>
 
         {/* Mission */}
         <View style={styles.missionCard}>
           <Text style={styles.missionIcon}>🎯</Text>
-          <Text style={styles.missionTitle}>Our Mission</Text>
-          <Text style={styles.missionText}>
-            To make high-quality JNVST preparation available to every student in India, regardless of their economic background or geographic location.
-          </Text>
+          <Text style={styles.missionTitle}>{t('about.missionTitle')}</Text>
+          <Text style={styles.missionText}>{t('about.missionText')}</Text>
         </View>
 
         {/* Team */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Meet Our Experts</Text>
+          <Text style={styles.sectionTitle}>{t('about.teamTitle')}</Text>
           {TEAM.map((member) => (
             <View key={member.name} style={styles.teamCard}>
               <View style={[styles.teamAvatar, { backgroundColor: getAvatarColor(member.name) }]}>
@@ -60,8 +55,8 @@ export default function AboutScreen({ navigation }) {
               </View>
               <View style={styles.teamInfo}>
                 <Text style={styles.teamName}>{member.name}</Text>
-                <Text style={styles.teamRole}>{member.role}</Text>
-                <Text style={styles.teamExp}>{member.exp}</Text>
+                <Text style={styles.teamRole}>{t(member.roleKey)}</Text>
+                <Text style={styles.teamExp}>{t(member.expKey)}</Text>
               </View>
             </View>
           ))}

@@ -4,6 +4,7 @@ const TOKEN_KEY = 'np_auth_token';
 const USER_KEY = 'np_user';
 const COURSES_CACHE_KEY = 'np_courses_cache';
 const MOCK_TEST_STATE_KEY = 'np_mock_test_state';
+const LANGUAGE_KEY = 'np_language';
 
 export const storage = {
   async setToken(token) {
@@ -45,7 +46,14 @@ export const storage = {
   async clearMockTestState() {
     await AsyncStorage.removeItem(MOCK_TEST_STATE_KEY);
   },
+  async setLanguage(lang) {
+    await AsyncStorage.setItem(LANGUAGE_KEY, lang);
+  },
+  async getLanguage() {
+    return AsyncStorage.getItem(LANGUAGE_KEY);
+  },
   async clear() {
+    // LANGUAGE_KEY intentionally excluded — preference persists across logouts.
     await AsyncStorage.multiRemove([TOKEN_KEY, USER_KEY, COURSES_CACHE_KEY, MOCK_TEST_STATE_KEY]);
   },
 };

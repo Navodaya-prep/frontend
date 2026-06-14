@@ -8,6 +8,7 @@ import { selectAnswer, tickTimer, submitMockTest, resetMockTest } from '../../st
 import { colors } from '../../theme/colors';
 import { typography } from '../../theme/typography';
 import { radius, spacing } from '../../theme/spacing';
+import { pickLocalized } from '../../utils/localize';
 import { formatTime } from '../../utils/formatters';
 import { AppLoader } from '../../components/common/AppLoader';
 import { QuestionCard } from '../../components/mcq/QuestionCard';
@@ -132,7 +133,7 @@ export default function MockTestScreen({ navigation }) {
           <Text style={styles.exitBtn}>✕ Exit</Text>
         </TouchableOpacity>
         <View style={styles.headerCenter}>
-          <Text style={styles.testTitle} numberOfLines={1}>{activeTest.title}</Text>
+          <Text style={styles.testTitle} numberOfLines={1}>{pickLocalized(activeTest, 'title')}</Text>
           <Text style={styles.testProgress}>{answeredCount}/{total} answered</Text>
         </View>
         <View style={[styles.timerBox, isLowTime && styles.timerBoxLow]}>

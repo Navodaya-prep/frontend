@@ -3,6 +3,8 @@ import {
   View, Text, ScrollView, TouchableOpacity, StyleSheet, StatusBar, Dimensions, Modal, Image,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useTranslation } from 'react-i18next';
+import { storage } from '../../utils/storage';
 import { colors } from '../../theme/colors';
 import { typography } from '../../theme/typography';
 import { radius, spacing } from '../../theme/spacing';
@@ -10,12 +12,12 @@ import { radius, spacing } from '../../theme/spacing';
 const { width } = Dimensions.get('window');
 
 const FEATURES = [
-  { icon: '🎥', title: 'Video Lessons', desc: 'Expert-taught concept videos', highlight: '100+ Videos' },
-  { icon: '📋', title: 'Mock Tests', desc: 'Full-length timed exams', highlight: '50+ Tests' },
-  { icon: '🧠', title: 'Practice MCQs', desc: '1200+ chapter-wise questions', highlight: '1200+ MCQs' },
-  { icon: '👨‍🏫', title: 'Expert Mentors', desc: 'Doubt support anytime', highlight: '24/7 Support' },
-  { icon: '🔴', title: 'Live Classes', desc: 'Interactive doubt sessions', highlight: 'Daily Live' },
-  { icon: '📊', title: 'Progress Tracking', desc: 'Detailed analytics & reports', highlight: 'AI Powered' },
+  { icon: '🎥', titleKey: 'landing.featureVideoTitle', descKey: 'landing.featureVideoDesc', highlightKey: 'landing.featureVideoHighlight' },
+  { icon: '📋', titleKey: 'landing.featureMockTitle', descKey: 'landing.featureMockDesc', highlightKey: 'landing.featureMockHighlight' },
+  { icon: '🧠', titleKey: 'landing.featureMcqTitle', descKey: 'landing.featureMcqDesc', highlightKey: 'landing.featureMcqHighlight' },
+  { icon: '👨‍🏫', titleKey: 'landing.featureMentorTitle', descKey: 'landing.featureMentorDesc', highlightKey: 'landing.featureMentorHighlight' },
+  { icon: '🔴', titleKey: 'landing.featureLiveTitle', descKey: 'landing.featureLiveDesc', highlightKey: 'landing.featureLiveHighlight' },
+  { icon: '📊', titleKey: 'landing.featureProgressTitle', descKey: 'landing.featureProgressDesc', highlightKey: 'landing.featureProgressHighlight' },
 ];
 
 const SUCCESS_STORIES = [
@@ -51,6 +53,13 @@ const SUCCESS_STORIES = [
 
 export default function LandingScreen({ navigation }) {
   const [selectedStory, setSelectedStory] = useState(null);
+  const { t, i18n } = useTranslation();
+
+  const toggleLanguage = async () => {
+    const next = i18n.language === 'hi' ? 'en' : 'hi';
+    await i18n.changeLanguage(next);
+    await storage.setLanguage(next);
+  };
 
   return (
     <View style={styles.root}>
@@ -63,33 +72,38 @@ export default function LandingScreen({ navigation }) {
               <Image source={require('../../../assets/logo.jpg')} style={styles.logoImg} />
               <Text style={styles.logo}>NavodayaSarthi</Text>
             </View>
-            <TouchableOpacity style={styles.loginBtn} onPress={() => navigation.navigate('Login')}>
-              <Text style={styles.loginBtnText}>Login</Text>
-            </TouchableOpacity>
+            <View style={styles.headerActions}>
+              <TouchableOpacity style={styles.langBtn} onPress={toggleLanguage} activeOpacity={0.7}>
+                <Text style={styles.langBtnText}>🌐 {i18n.language === 'hi' ? 'EN' : 'हिं'}</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.loginBtn} onPress={() => navigation.navigate('Login')}>
+                <Text style={styles.loginBtnText}>{t('auth.login')}</Text>
+              </TouchableOpacity>
+            </View>
           </View>
         </SafeAreaView>
 
         {/* Hero Section */}
         <View style={styles.hero}>
           <View style={styles.heroBadge}>
-            <Text style={styles.heroBadgeText}>🎯 #1 JNVST Preparation Platform</Text>
+            <Text style={styles.heroBadgeText}>{t('landing.heroBadge')}</Text>
           </View>
-          <Text style={styles.heroTitle}>Your Journey to{'\n'}NavodayaSarthi Excellence{'\n'}Starts Here</Text>
+          <Text style={styles.heroTitle}>{t('landing.heroTitle')}</Text>
           <Text style={styles.heroSubtitle}>
-            Join 1,000+ students preparing for Jawahar Navodaya Vidyalaya Selection Test with India's most trusted JNVST app. Learn from expert educators, practice with 1200+ questions, and track your progress every day.
+            {t('landing.heroSubtitle')}
           </Text>
           <TouchableOpacity style={styles.ctaBtn} onPress={() => navigation.navigate('Login')}>
-            <Text style={styles.ctaBtnText}>Get Started →</Text>
+            <Text style={styles.ctaBtnText}>{t('landing.getStarted')}</Text>
           </TouchableOpacity>
-          <Text style={styles.ctaNote}>✓ No credit card required · ✓ 100% Free for all students</Text>
+          <Text style={styles.ctaNote}>{t('landing.ctaNote')}</Text>
 
           {/* Stats */}
           <View style={styles.statsRow}>
             {[
-              ['1K+', 'Active Students'],
-              ['1200+', 'Practice Questions'],
-              ['3 Subjects', 'Full Coverage'],
-              ['100+', 'Video Lessons']
+              ['1K+', t('landing.statActiveStudents')],
+              ['1200+', t('landing.statPracticeQuestions')],
+              [t('landing.statSubjects'), t('landing.statFullCoverage')],
+              ['100+', t('landing.statVideoLessons')]
             ].map(([num, label]) => (
               <View key={label} style={styles.statItem}>
                 <Text style={styles.statNum}>{num}</Text>
@@ -101,11 +115,11 @@ export default function LandingScreen({ navigation }) {
 
         {/* Trust Indicators */}
         <View style={styles.trustSection}>
-          <Text style={styles.trustTitle}>Trusted by Students Across India 🇮🇳</Text>
+          <Text style={styles.trustTitle}>{t('landing.trustTitle')}</Text>
           <View style={styles.trustGrid}>
             {[
-              { icon: '🔒', text: '100% Safe', sub: 'Secure & Private' },
-              { icon: '📱', text: 'Works Offline', sub: '2G Compatible' },
+              { icon: '🔒', text: t('landing.trustSafe'), sub: t('landing.trustSafeSub') },
+              { icon: '📱', text: t('landing.trustOffline'), sub: t('landing.trustOfflineSub') },
             ].map((item) => (
               <View key={item.text} style={styles.trustCard}>
                 <Text style={styles.trustIcon}>{item.icon}</Text>
@@ -118,19 +132,19 @@ export default function LandingScreen({ navigation }) {
 
         {/* Features */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Everything You Need to Crack JNVST</Text>
-          <Text style={styles.sectionSubtitle}>Complete preparation package in one app</Text>
+          <Text style={styles.sectionTitle}>{t('landing.featuresTitle')}</Text>
+          <Text style={styles.sectionSubtitle}>{t('landing.featuresSubtitle')}</Text>
           <View style={styles.featuresGrid}>
             {FEATURES.map((f) => (
-              <View key={f.title} style={styles.featureCard}>
+              <View key={f.titleKey} style={styles.featureCard}>
                 <View style={styles.featureTop}>
                   <Text style={styles.featureIcon}>{f.icon}</Text>
                   <View style={styles.featureBadge}>
-                    <Text style={styles.featureBadgeText}>{f.highlight}</Text>
+                    <Text style={styles.featureBadgeText}>{t(f.highlightKey)}</Text>
                   </View>
                 </View>
-                <Text style={styles.featureTitle}>{f.title}</Text>
-                <Text style={styles.featureDesc}>{f.desc}</Text>
+                <Text style={styles.featureTitle}>{t(f.titleKey)}</Text>
+                <Text style={styles.featureDesc}>{t(f.descKey)}</Text>
               </View>
             ))}
           </View>
@@ -138,13 +152,13 @@ export default function LandingScreen({ navigation }) {
 
         {/* How It Works */}
         <View style={styles.howItWorksSection}>
-          <Text style={styles.sectionTitle}>How It Works</Text>
-          <Text style={styles.sectionSubtitle}>Your path to success in 4 simple steps</Text>
+          <Text style={styles.sectionTitle}>{t('landing.howItWorksTitle')}</Text>
+          <Text style={styles.sectionSubtitle}>{t('landing.howItWorksSubtitle')}</Text>
           {[
-            { step: '1', icon: '📱', title: 'Download & Sign Up', desc: 'Create your free account in 30 seconds' },
-            { step: '2', icon: '📚', title: 'Start Learning', desc: 'Select subjects and start learning' },
-            { step: '3', icon: '🎯', title: 'Practice Daily', desc: 'Solve questions, watch videos, take tests' },
-            { step: '4', icon: '🏆', title: 'Track & Improve', desc: 'Monitor progress and ace the exam' },
+            { step: '1', icon: '📱', title: t('landing.step1Title'), desc: t('landing.step1Desc') },
+            { step: '2', icon: '📚', title: t('landing.step2Title'), desc: t('landing.step2Desc') },
+            { step: '3', icon: '🎯', title: t('landing.step3Title'), desc: t('landing.step3Desc') },
+            { step: '4', icon: '🏆', title: t('landing.step4Title'), desc: t('landing.step4Desc') },
           ].map((item) => (
             <View key={item.step} style={styles.stepCard}>
               <View style={styles.stepNumber}>
@@ -163,8 +177,8 @@ export default function LandingScreen({ navigation }) {
 
         {/* Success Stories */}
         <View style={[styles.section, styles.successSection]}>
-          <Text style={[styles.sectionTitle, { color: colors.white }]}>Success Stories</Text>
-          <Text style={styles.successSubtitle}>Real students, real results, real dreams achieved ✨</Text>
+          <Text style={[styles.sectionTitle, { color: colors.white }]}>{t('landing.successTitle')}</Text>
+          <Text style={styles.successSubtitle}>{t('landing.successSubtitle')}</Text>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.storiesScroll}>
             {SUCCESS_STORIES.map((s) => (
               <TouchableOpacity 
@@ -178,8 +192,8 @@ export default function LandingScreen({ navigation }) {
                 </View>
                 <Text style={styles.storyName}>{s.name}</Text>
                 <Text style={styles.storySchool}>{s.school}</Text>
-                <Text style={styles.storyYear}>Class of {s.year}</Text>
-                <Text style={styles.storyReadMore}>Tap to read story →</Text>
+                <Text style={styles.storyYear}>{t('landing.classOf', { year: s.year })}</Text>
+                <Text style={styles.storyReadMore}>{t('landing.tapToRead')}</Text>
               </TouchableOpacity>
             ))}
           </ScrollView>
@@ -187,12 +201,12 @@ export default function LandingScreen({ navigation }) {
 
         {/* Why Choose Us */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Why Students Choose Us</Text>
+          <Text style={styles.sectionTitle}>{t('landing.whyTitle')}</Text>
           {[
-            { icon: '🎁', title: 'Completely Free', desc: 'All features unlocked for every student, no hidden charges' },
-            { icon: '🌍', title: 'Learn Anywhere', desc: 'Works on 2G/3G/4G. Download content for offline access' },
-            { icon: '📞', title: '24/7 Support', desc: 'WhatsApp support & live doubt resolution every day' },
-            { icon: '🎓', title: 'Expert Teachers', desc: 'Learn from IIT, IIM & top university educators' },
+            { icon: '🎁', title: t('landing.whyFreeTitle'), desc: t('landing.whyFreeDesc') },
+            { icon: '🌍', title: t('landing.whyAnywhereTitle'), desc: t('landing.whyAnywhereDesc') },
+            { icon: '📞', title: t('landing.whySupportTitle'), desc: t('landing.whySupportDesc') },
+            { icon: '🎓', title: t('landing.whyTeachersTitle'), desc: t('landing.whyTeachersDesc') },
           ].map((item) => (
             <View key={item.title} style={styles.whyCard}>
               <Text style={styles.whyIcon}>{item.icon}</Text>
@@ -207,11 +221,11 @@ export default function LandingScreen({ navigation }) {
         {/* Nav Links */}
         <View style={styles.navLinks}>
           <TouchableOpacity onPress={() => navigation.navigate('About')} style={styles.navButton}>
-            <Text style={styles.navButtonText}>About Us</Text>
+            <Text style={styles.navButtonText}>{t('landing.aboutUs')}</Text>
             <Text style={styles.navButtonArrow}>→</Text>
           </TouchableOpacity>
           <TouchableOpacity onPress={() => navigation.navigate('FAQ')} style={styles.navButton}>
-            <Text style={styles.navButtonText}>FAQ & Support</Text>
+            <Text style={styles.navButtonText}>{t('landing.faqSupport')}</Text>
             <Text style={styles.navButtonArrow}>→</Text>
           </TouchableOpacity>
         </View>
@@ -219,10 +233,10 @@ export default function LandingScreen({ navigation }) {
         {/* CTA Bottom */}
         <View style={styles.bottomCta}>
           <Text style={styles.bottomCtaEmoji}>🚀</Text>
-          <Text style={styles.bottomCtaTitle}>Ready to Begin Your Journey?</Text>
-          <Text style={styles.bottomCtaSubtitle}>Join thousands of students who are already preparing</Text>
+          <Text style={styles.bottomCtaTitle}>{t('landing.bottomCtaTitle')}</Text>
+          <Text style={styles.bottomCtaSubtitle}>{t('landing.bottomCtaSubtitle')}</Text>
           <TouchableOpacity style={styles.ctaBtn} onPress={() => navigation.navigate('Login')}>
-            <Text style={styles.ctaBtnText}>Start Learning Now →</Text>
+            <Text style={styles.ctaBtnText}>{t('landing.startLearningNow')}</Text>
           </TouchableOpacity>
         </View>
 
@@ -232,41 +246,41 @@ export default function LandingScreen({ navigation }) {
             <Image source={require('../../../assets/logo.jpg')} style={styles.footerLogoImg} />
             <Text style={styles.footerLogo}>NavodayaSarthi</Text>
           </View>
-          <Text style={styles.footerTagline}>India's JNVST Preparation Platform</Text>
-          
+          <Text style={styles.footerTagline}>{t('landing.footerTagline')}</Text>
+
           <View style={styles.footerLinks}>
-            <Text style={styles.footerLinkTitle}>Quick Links</Text>
+            <Text style={styles.footerLinkTitle}>{t('landing.quickLinks')}</Text>
             <View style={styles.quickLinksRow}>
               <View style={styles.quickLinksColumn}>
                 <TouchableOpacity onPress={() => navigation.navigate('About')}>
-                  <Text style={styles.footerLink}>About Us</Text>
+                  <Text style={styles.footerLink}>{t('landing.aboutUs')}</Text>
                 </TouchableOpacity>
                 <TouchableOpacity onPress={() => navigation.navigate('FAQ')}>
-                  <Text style={styles.footerLink}>Help & FAQ</Text>
+                  <Text style={styles.footerLink}>{t('landing.helpFaq')}</Text>
                 </TouchableOpacity>
               </View>
               <View style={styles.quickLinksColumn}>
                 <TouchableOpacity onPress={() => navigation.navigate('PrivacyPolicy')}>
-                  <Text style={styles.footerLink}>Privacy Policy</Text>
+                  <Text style={styles.footerLink}>{t('landing.privacyPolicy')}</Text>
                 </TouchableOpacity>
                 <TouchableOpacity onPress={() => navigation.navigate('Terms')}>
-                  <Text style={styles.footerLink}>Terms of Service</Text>
+                  <Text style={styles.footerLink}>{t('landing.termsOfService')}</Text>
                 </TouchableOpacity>
               </View>
             </View>
           </View>
 
           <View style={styles.footerLinks}>
-            <Text style={styles.footerLinkTitle}>Contact Us</Text>
+            <Text style={styles.footerLinkTitle}>{t('landing.contactUs')}</Text>
             <Text style={styles.footerContact}>📧 navodayasarthi.help@gmail.com</Text>
             <Text style={styles.footerContact}>📞 +91 81759 47318</Text>
-            <Text style={styles.footerContact}>💬 WhatsApp Support Available</Text>
+            <Text style={styles.footerContact}>{t('landing.whatsappSupport')}</Text>
           </View>
 
 
 <View style={styles.footerBottom}>
-            <Text style={styles.footerCopyright}>© 2026 NavodayaSarthi. All rights reserved.</Text>
-            <Text style={styles.footerMadeWith}>Made with ❤️ in India for Indian Students</Text>
+            <Text style={styles.footerCopyright}>{t('landing.copyright')}</Text>
+            <Text style={styles.footerMadeWith}>{t('landing.madeWith')}</Text>
           </View>
         </View>
       </ScrollView>
@@ -304,18 +318,18 @@ export default function LandingScreen({ navigation }) {
                   </View>
 
                   <View style={styles.modalStory}>
-                    <Text style={styles.modalStoryTitle}>Success Story</Text>
+                    <Text style={styles.modalStoryTitle}>{t('landing.successStoryLabel')}</Text>
                     <Text style={styles.modalStoryText}>{selectedStory.story}</Text>
                   </View>
 
-                  <TouchableOpacity 
+                  <TouchableOpacity
                     style={styles.modalCtaBtn}
                     onPress={() => {
                       setSelectedStory(null);
                       navigation.navigate('Login');
                     }}
                   >
-                    <Text style={styles.modalCtaBtnText}>Start Your Journey →</Text>
+                    <Text style={styles.modalCtaBtnText}>{t('landing.startYourJourney')}</Text>
                   </TouchableOpacity>
                 </>
               )}
@@ -338,6 +352,12 @@ const styles = StyleSheet.create({
   logoImg: { width: 36, height: 36, borderRadius: 8, resizeMode: 'contain' },
   logo: { fontSize: typography.sizes.xl, fontWeight: typography.weights.extrabold, color: colors.white },
   logoSub: { fontSize: typography.sizes.sm, color: colors.accent, fontWeight: typography.weights.bold, marginTop: -4 },
+  headerActions: { flexDirection: 'row', alignItems: 'center', gap: spacing.xs },
+  langBtn: {
+    borderWidth: 2, borderColor: colors.white, borderRadius: radius.full,
+    paddingHorizontal: spacing.sm, paddingVertical: spacing.xs,
+  },
+  langBtnText: { color: colors.white, fontWeight: typography.weights.bold, fontSize: typography.sizes.sm },
   loginBtn: {
     borderWidth: 2, borderColor: colors.white, borderRadius: radius.full,
     paddingHorizontal: spacing.md, paddingVertical: spacing.xs,

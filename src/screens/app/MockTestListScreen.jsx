@@ -8,10 +8,10 @@ import { fetchMockTests, fetchUserAttempts } from '../../store/mockTestSlice';
 import { colors } from '../../theme/colors';
 import { typography } from '../../theme/typography';
 import { radius, spacing } from '../../theme/spacing';
+import { useTranslation } from 'react-i18next';
+import { pickLocalized } from '../../utils/localize';
 import { formatTime, formatPercent, getGrade } from '../../utils/formatters';
 import { AppLoader } from '../../components/common/AppLoader';
-
-const TABS = ['Available', 'Completed'];
 
 const SUBJECT_COLOR = {
   mental_ability: colors.primary,
@@ -29,11 +29,21 @@ const SUBJECT_LABEL = {
 
 export default function MockTestListScreen({ navigation }) {
   const dispatch = useDispatch();
+  const { t } = useTranslation();
   const { tests, status } = useSelector((s) => s.mockTest);
+  const user = useSelector((s) => s.auth.user);
   const [activeTab, setActiveTab] = useState(0);
   const [refreshing, setRefreshing] = useState(false);
 
   const displayTests = tests;
+
+  // Premium tests are locked for non-premium students. Tapping a locked test
+  // sends them to the upgrade screen instead of starting it.
+  const isLocked = (test) => test.isPremium && !user?.isPremium;
+  const startTest = (test) => {
+    if (isLocked(test)) navigation.navigate('PremiumUpgrade');
+    else navigation.navigate('MockTestStart', { test });
+  };
 
   const availableTests = displayTests.filter((t) => !t.latestAttempt);
   const completedTests = displayTests.filter((t) => !!t.latestAttempt);
@@ -55,7 +65,7 @@ export default function MockTestListScreen({ navigation }) {
     return (
       <TouchableOpacity
         style={styles.card}
-        onPress={() => navigation.navigate('MockTestStart', { test })}
+        onPress={() => startTest(test)}
         activeOpacity={0.85}
       >
         <View style={[styles.cardAccent, { backgroundColor: subjectColor }]} />
@@ -72,18 +82,18 @@ export default function MockTestListScreen({ navigation }) {
               </View>
             )}
           </View>
-          <Text style={styles.cardTitle}>{test.title}</Text>
+          <Text style={styles.cardTitle}>{pickLocalized(test, 'title')}</Text>
           <View style={styles.cardMeta}>
-            <Text style={styles.metaItem}>📝 {test.questionCount || '—'} Questions</Text>
+            <Text style={styles.metaItem}>📝 {test.questionCount || '—'} {t('mockTest.questions')}</Text>
             <Text style={styles.metaDot}>·</Text>
-            <Text style={styles.metaItem}>⏱ {test.duration} mins</Text>
+            <Text style={styles.metaItem}>⏱ {test.duration} {t('mockTest.mins')}</Text>
           </View>
           <View style={styles.cardFooter}>
             <TouchableOpacity
               style={[styles.startBtn, { backgroundColor: subjectColor }]}
-              onPress={() => navigation.navigate('MockTestStart', { test })}
+              onPress={() => startTest(test)}
             >
-              <Text style={styles.startBtnText}>Start Test →</Text>
+              <Text style={styles.startBtnText}>{isLocked(test) ? t('mockTest.unlockPremium') : t('mockTest.startBtn')}</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -120,7 +130,7 @@ export default function MockTestListScreen({ navigation }) {
             </View>
           </View>
 
-          <Text style={styles.cardTitle}>{test.title}</Text>
+          <Text style={styles.cardTitle}>{pickLocalized(test, 'title')}</Text>
 
           {/* Score bar */}
           <View style={styles.scoreRow}>
@@ -134,7 +144,7 @@ export default function MockTestListScreen({ navigation }) {
           </View>
 
           <Text style={styles.attemptDate}>
-            Completed {new Date(attempt.completedAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
+            {t('mockTest.completedOn')} {new Date(attempt.completedAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
           </Text>
 
           <View style={styles.cardFooter}>
@@ -142,13 +152,13 @@ export default function MockTestListScreen({ navigation }) {
               style={styles.reviewBtn}
               onPress={() => navigation.navigate('MockTestResult', { test, result: attempt, fromHistory: true })}
             >
-              <Text style={styles.reviewBtnText}>Review</Text>
+              <Text style={styles.reviewBtnText}>{t('mockTest.review')}</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.retestBtn}
-              onPress={() => navigation.navigate('MockTestStart', { test })}
+              onPress={() => startTest(test)}
             >
-              <Text style={styles.retestBtnText}>🔄 Retest</Text>
+              <Text style={styles.retestBtnText}>{isLocked(test) ? t('mockTest.unlock') : t('mockTest.retest')}</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -161,17 +171,17 @@ export default function MockTestListScreen({ navigation }) {
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Text style={styles.back}>← Back</Text>
+          <Text style={styles.back}>{t('common.back')}</Text>
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Mock Tests</Text>
+        <Text style={styles.headerTitle}>{t('mockTest.title')}</Text>
         <View style={{ width: 60 }} />
       </View>
 
       {/* Tabs */}
       <View style={styles.tabBar}>
-        {TABS.map((tab, i) => (
+        {[t('mockTest.available'), t('mockTest.completed')].map((tab, i) => (
           <TouchableOpacity
-            key={tab}
+            key={i}
             style={[styles.tab, activeTab === i && styles.tabActive]}
             onPress={() => setActiveTab(i)}
           >
@@ -194,12 +204,10 @@ export default function MockTestListScreen({ navigation }) {
         <View style={styles.emptyState}>
           <Text style={styles.emptyEmoji}>{activeTab === 0 ? '🎉' : '📋'}</Text>
           <Text style={styles.emptyTitle}>
-            {activeTab === 0 ? 'All tests completed!' : 'No completed tests yet'}
+            {activeTab === 0 ? t('mockTest.emptyAvailableTitle') : t('mockTest.emptyCompletedTitle')}
           </Text>
           <Text style={styles.emptySubtitle}>
-            {activeTab === 0
-              ? 'You have completed all available tests. Check the Completed tab.'
-              : 'Start a test from the Available tab to see your results here.'}
+            {activeTab === 0 ? t('mockTest.emptyAvailableSubtitle') : t('mockTest.emptyCompletedSubtitle')}
           </Text>
         </View>
       ) : (

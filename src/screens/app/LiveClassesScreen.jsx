@@ -10,28 +10,36 @@ import { AppLoader } from '../../components/common/AppLoader';
 import { colors } from '../../theme/colors';
 import { typography } from '../../theme/typography';
 import { spacing, radius } from '../../theme/spacing';
+import { pickLocalized } from '../../utils/localize';
 
 export default function LiveClassesScreen({ navigation }) {
   const dispatch = useDispatch();
   const { classes, loading, error } = useSelector((s) => s.liveClass);
+  const user = useSelector((s) => s.auth.user);
 
   useEffect(() => {
     dispatch(fetchActiveLiveClasses());
   }, []);
+
+  // Premium live classes are locked for non-premium students.
+  const joinClass = (item) => {
+    if (item.isPremium && !user?.isPremium) navigation.navigate('PremiumUpgrade');
+    else navigation.navigate('LiveClass', { classData: item });
+  };
 
   function renderItem({ item }) {
     return (
       <TouchableOpacity
         style={styles.card}
         activeOpacity={0.8}
-        onPress={() => navigation.navigate('LiveClass', { classData: item })}
+        onPress={() => joinClass(item)}
       >
         <View style={styles.cardTop}>
           <View style={styles.liveDot} />
           <Text style={styles.liveLabel}>LIVE</Text>
           {item.isPremium && <View style={styles.premiumBadge}><Text style={styles.premiumText}>★ Premium</Text></View>}
         </View>
-        <Text style={styles.title}>{item.title}</Text>
+        <Text style={styles.title}>{pickLocalized(item, 'title')}</Text>
         <Text style={styles.meta}>{item.subject} · Class {item.classLevel}</Text>
         <Text style={styles.teacher}>👨‍🏫 {item.teacherName}</Text>
         {item.description ? <Text style={styles.desc} numberOfLines={2}>{item.description}</Text> : null}

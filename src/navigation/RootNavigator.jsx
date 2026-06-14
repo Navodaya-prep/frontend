@@ -36,6 +36,7 @@ import LessonPlayerScreen from '../screens/app/LessonPlayerScreen';
 import DailyChallengeScreen from '../screens/app/DailyChallengeScreen';
 import EditProfileScreen from '../screens/app/EditProfileScreen';
 import AnalyticsScreen from '../screens/app/AnalyticsScreen';
+import PremiumUpgradeScreen from '../screens/app/PremiumUpgradeScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -101,6 +102,13 @@ export default function RootNavigator() {
             <Stack.Screen name="PracticeSubjects" component={PracticeSubjectsScreen} />
             <Stack.Screen name="PracticeChapters" component={PracticeChaptersScreen} />
             <Stack.Screen name="PracticeChapterDetail" component={PracticeChapterDetailScreen} />
+
+            {/* Premium upgrade */}
+            <Stack.Screen
+              name="PremiumUpgrade"
+              component={PremiumUpgradeScreen}
+              options={{ presentation: 'modal' }}
+            />
 
             {/* Recorded Classes */}
             <Stack.Screen name="RecordedClasses" component={CoursesScreen} />

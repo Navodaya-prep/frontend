@@ -1,38 +1,33 @@
 import React, { useState } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, TextInput, StyleSheet, Linking, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useTranslation } from 'react-i18next';
 import Footer from '../../components/common/Footer';
 import { colors } from '../../theme/colors';
 import { typography } from '../../theme/typography';
 import { radius, spacing } from '../../theme/spacing';
 import { API_BASE_URL } from '../../config';
 
-const FAQS = [
-  { q: 'When is the JNVST exam held?', a: 'JNVST for Class 6 is typically held in November every year. For Class 9, it is held in February. Admit cards are released 2-3 weeks before the exam.' },
-  { q: 'Is this app free to use?', a: 'Yes! NavodayaSarthi is completely free for all students. Every feature — practice questions, mock tests, video lessons, live classes, and more — is fully unlocked at no cost.' },
-  { q: 'How to reset my password?', a: 'We use OTP-based login — no password needed! Just enter your registered mobile number and verify the OTP you receive via SMS.' },
-  { q: 'Which classes is this app for?', a: 'This app is designed for Class 5 students appearing for JNVST (for Class 6 admission) and Class 8 students appearing for JNVST (for Class 9 admission).' },
-  { q: 'Does the app work offline?', a: 'Practice questions and downloaded content are accessible offline. Video streaming requires an internet connection, though we optimize for low-bandwidth usage.' },
-  { q: 'What subjects are covered?', a: 'All three JNVST subjects are covered: Mental Ability (40 questions), Arithmetic (20 questions), and Language — Hindi/English (20 questions).' },
-  { q: 'How is the mock test structured?', a: 'Our mock tests mirror the actual JNVST format: 80 questions, 2 hours, with a digital OMR sheet interface to help you practice filling circles.' },
-];
+const FAQ_KEYS = ['1', '2', '3', '4', '5', '6', '7'];
 
 const phoneRegex = /^[6-9]\d{9}$/;
 
-function FAQItem({ faq }) {
+function FAQItem({ qKey, aKey }) {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   return (
     <TouchableOpacity style={styles.faqItem} onPress={() => setOpen(!open)} activeOpacity={0.8}>
       <View style={styles.faqHeader}>
-        <Text style={styles.faqQ}>{faq.q}</Text>
+        <Text style={styles.faqQ}>{t(qKey)}</Text>
         <Text style={styles.faqIcon}>{open ? '▲' : '▼'}</Text>
       </View>
-      {open && <Text style={styles.faqA}>{faq.a}</Text>}
+      {open && <Text style={styles.faqA}>{t(aKey)}</Text>}
     </TouchableOpacity>
   );
 }
 
 export default function FAQScreen({ navigation }) {
+  const { t } = useTranslation();
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [query, setQuery] = useState('');
@@ -46,16 +41,16 @@ export default function FAQScreen({ navigation }) {
 
   const validate = () => {
     const e = {};
-    if (!name.trim()) e.name = 'Name is required';
+    if (!name.trim()) e.name = t('faq.errNameRequired');
     if (!phone.trim()) {
-      e.phone = 'Phone number is required';
+      e.phone = t('faq.errPhoneRequired');
     } else if (!phoneRegex.test(phone.trim())) {
-      e.phone = 'Enter a valid 10-digit mobile number';
+      e.phone = t('faq.errPhoneInvalid');
     }
     if (!query.trim()) {
-      e.query = 'Message is required';
+      e.query = t('faq.errMessageRequired');
     } else if (query.trim().length < 30) {
-      e.query = `Message must be at least 30 characters (${query.trim().length}/30)`;
+      e.query = t('faq.errMessageMin', { n: query.trim().length });
     }
     return e;
   };
@@ -75,13 +70,13 @@ export default function FAQScreen({ navigation }) {
         body: JSON.stringify({ name: name.trim(), phone: phone.trim(), message: query.trim() }),
       });
       const json = await res.json();
-      if (!res.ok || !json.success) throw new Error(json.message || 'Failed to send');
+      if (!res.ok || !json.success) throw new Error(json.message || t('faq.errSendFailed'));
       setSubmitted(true);
       setName('');
       setPhone('');
       setQuery('');
     } catch (err) {
-      setErrors({ submit: err.message || 'Something went wrong. Please try again.' });
+      setErrors({ submit: err.message || t('faq.errGeneric') });
     } finally {
       setLoading(false);
     }
@@ -91,36 +86,36 @@ export default function FAQScreen({ navigation }) {
     <SafeAreaView style={styles.safe}>
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Text style={styles.back}>← Back</Text>
+          <Text style={styles.back}>{t('common.back')}</Text>
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>FAQ & Contact</Text>
+        <Text style={styles.headerTitle}>{t('faq.title')}</Text>
         <View style={{ width: 60 }} />
       </View>
       <ScrollView showsVerticalScrollIndicator={false}>
         {/* FAQ */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Frequently Asked Questions</Text>
-          {FAQS.map((faq, i) => <FAQItem key={i} faq={faq} />)}
+          <Text style={styles.sectionTitle}>{t('faq.faqTitle')}</Text>
+          {FAQ_KEYS.map((k) => <FAQItem key={k} qKey={`faq.q${k}`} aKey={`faq.a${k}`} />)}
         </View>
 
         {/* Contact Form */}
         <View style={styles.contactSection}>
-          <Text style={styles.sectionTitle}>Get In Touch</Text>
+          <Text style={styles.sectionTitle}>{t('faq.contactTitle')}</Text>
 
           {submitted ? (
             <View style={styles.successBox}>
               <Text style={styles.successIcon}>✅</Text>
-              <Text style={styles.successTitle}>Message Sent!</Text>
-              <Text style={styles.successText}>We have received your message and will get back to you shortly.</Text>
+              <Text style={styles.successTitle}>{t('faq.successTitle')}</Text>
+              <Text style={styles.successText}>{t('faq.successText')}</Text>
               <TouchableOpacity style={styles.sendAnotherBtn} onPress={() => setSubmitted(false)}>
-                <Text style={styles.sendAnotherText}>Send Another Message</Text>
+                <Text style={styles.sendAnotherText}>{t('faq.sendAnother')}</Text>
               </TouchableOpacity>
             </View>
           ) : (
             <>
               <TextInput
                 style={[styles.input, errors.name && styles.inputError]}
-                placeholder="Your Name *"
+                placeholder={t('faq.namePlaceholder')}
                 placeholderTextColor={colors.textLight}
                 value={name}
                 onChangeText={(v) => { setName(v); setErrors((p) => ({ ...p, name: undefined })); }}
@@ -129,7 +124,7 @@ export default function FAQScreen({ navigation }) {
 
               <TextInput
                 style={[styles.input, errors.phone && styles.inputError]}
-                placeholder="Mobile Number *"
+                placeholder={t('faq.phonePlaceholder')}
                 placeholderTextColor={colors.textLight}
                 value={phone}
                 onChangeText={(v) => { setPhone(v); setErrors((p) => ({ ...p, phone: undefined })); }}
@@ -140,14 +135,14 @@ export default function FAQScreen({ navigation }) {
 
               <TextInput
                 style={[styles.input, styles.textarea, errors.query && styles.inputError]}
-                placeholder="Your Message * (min. 30 characters)"
+                placeholder={t('faq.messagePlaceholder')}
                 placeholderTextColor={colors.textLight}
                 value={query}
                 onChangeText={(v) => { setQuery(v); setErrors((p) => ({ ...p, query: undefined })); }}
                 multiline
                 numberOfLines={4}
               />
-              <Text style={styles.charCount}>{query.trim().length}/30 min</Text>
+              <Text style={styles.charCount}>{t('faq.charCount', { n: query.trim().length })}</Text>
               {errors.query && <Text style={styles.errorText}>{errors.query}</Text>}
 
               {errors.submit && <Text style={styles.errorText}>{errors.submit}</Text>}
@@ -156,7 +151,7 @@ export default function FAQScreen({ navigation }) {
                 {loading ? (
                   <ActivityIndicator color={colors.white} />
                 ) : (
-                  <Text style={styles.submitBtnText}>Send Message</Text>
+                  <Text style={styles.submitBtnText}>{t('faq.sendMessage')}</Text>
                 )}
               </TouchableOpacity>
             </>
@@ -167,8 +162,8 @@ export default function FAQScreen({ navigation }) {
         <TouchableOpacity style={styles.whatsappBtn} onPress={openWhatsApp}>
           <Text style={styles.whatsappIcon}>💬</Text>
           <View>
-            <Text style={styles.whatsappTitle}>Chat on WhatsApp</Text>
-            <Text style={styles.whatsappSub}>Get instant support from our team</Text>
+            <Text style={styles.whatsappTitle}>{t('faq.whatsappTitle')}</Text>
+            <Text style={styles.whatsappSub}>{t('faq.whatsappSub')}</Text>
           </View>
         </TouchableOpacity>
 

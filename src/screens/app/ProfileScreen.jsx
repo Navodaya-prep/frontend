@@ -1,23 +1,35 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Alert, ScrollView } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Alert, ScrollView, Modal } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useDispatch, useSelector } from 'react-redux';
+import { useTranslation } from 'react-i18next';
 import { logout, fetchProfile } from '../../store/authSlice';
 import { profileApi } from '../../api/profileApi';
+import { storage } from '../../utils/storage';
+import { LANGUAGES } from '../../i18n';
 import { colors } from '../../theme/colors';
 import { typography } from '../../theme/typography';
 import { radius, spacing } from '../../theme/spacing';
 
 const MENU_ITEMS = [
-  { icon: '📊', title: 'My Progress', subtitle: 'View your performance analytics', screen: 'Analytics' },
-  { icon: '🔒', title: 'Privacy Policy', subtitle: 'Read our privacy policy', screen: 'PrivacyPolicy' },
-  { icon: '📞', title: 'Help & Support', subtitle: 'Contact us for help', screen: 'Doubts', tab: true },
+  { icon: '📊', titleKey: 'profile.myProgress', subKey: 'profile.myProgressSub', screen: 'Analytics' },
+  { icon: '🌐', titleKey: 'profile.language', subKey: 'profile.languageSub', action: 'language' },
+  { icon: '🔒', titleKey: 'profile.privacyPolicy', subKey: 'profile.privacyPolicySub', screen: 'PrivacyPolicy' },
+  { icon: '📞', titleKey: 'profile.helpSupport', subKey: 'profile.helpSupportSub', screen: 'Doubts', tab: true },
 ];
 
 export default function ProfileScreen({ navigation }) {
   const dispatch = useDispatch();
+  const { t, i18n } = useTranslation();
   const { user } = useSelector((s) => s.auth);
   const [stats, setStats] = useState({ totalTests: 0, totalScore: 0, bestScore: 0 });
+  const [langModal, setLangModal] = useState(false);
+
+  const changeLanguage = async (code) => {
+    await i18n.changeLanguage(code);
+    await storage.setLanguage(code);
+    setLangModal(false);
+  };
 
   useEffect(() => {
     loadProfile();
@@ -36,16 +48,24 @@ export default function ProfileScreen({ navigation }) {
   };
 
   const handleLogout = () => {
-    Alert.alert('Logout', 'Are you sure you want to logout?', [
-      { text: 'Cancel', style: 'cancel' },
-      { text: 'Logout', style: 'destructive', onPress: () => dispatch(logout()) },
+    Alert.alert(t('profile.logout'), t('profile.logoutConfirm'), [
+      { text: t('common.cancel'), style: 'cancel' },
+      { text: t('profile.logout'), style: 'destructive', onPress: () => dispatch(logout()) },
     ]);
+  };
+
+  const handleMenuPress = (item) => {
+    if (item.action === 'language') {
+      setLangModal(true);
+    } else if (item.screen) {
+      item.tab ? navigation.navigate(item.screen) : navigation.getParent()?.navigate(item.screen);
+    }
   };
 
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>My Profile</Text>
+        <Text style={styles.headerTitle}>{t('profile.title')}</Text>
       </View>
       <ScrollView showsVerticalScrollIndicator={false}>
         {/* Profile Card */}
@@ -53,19 +73,19 @@ export default function ProfileScreen({ navigation }) {
           <View style={styles.avatar}>
             <Text style={styles.avatarText}>{user?.name?.[0] || 'S'}</Text>
           </View>
-          <Text style={styles.userName}>{user?.name || 'Student'}</Text>
+          <Text style={styles.userName}>{user?.name || t('common.student')}</Text>
           <Text style={styles.userPhone}>+91 {user?.phone || '—'}</Text>
           <TouchableOpacity style={styles.editBtn} onPress={() => navigation.getParent()?.navigate('EditProfile')}>
-            <Text style={styles.editBtnText}>Edit Profile</Text>
+            <Text style={styles.editBtnText}>{t('profile.editProfile')}</Text>
           </TouchableOpacity>
         </View>
 
         {/* Stats */}
         <View style={styles.statsRow}>
           {[
-            [stats.totalTests || 0, 'Tests Done'],
-            [user?.starPoints || 0, 'Star Points'],
-            [user?.streak || 0, 'Day Streak']
+            [stats.totalTests || 0, t('profile.testsDone')],
+            [user?.starPoints || 0, t('profile.starPoints')],
+            [user?.streak || 0, t('profile.dayStreakLabel')]
           ].map(([val, label]) => (
             <View key={label} style={styles.statItem}>
               <Text style={styles.statVal}>{val}</Text>
@@ -76,28 +96,54 @@ export default function ProfileScreen({ navigation }) {
 
         {/* Menu */}
         <View style={styles.menu}>
-          {MENU_ITEMS.map((item) => (
-            <TouchableOpacity
-              key={item.title}
-              style={[styles.menuItem, !item.screen && styles.menuItemDisabled]}
-              onPress={() => item.screen && (item.tab ? navigation.navigate(item.screen) : navigation.getParent()?.navigate(item.screen))}
-              activeOpacity={item.screen ? 0.7 : 1}
-            >
-              <Text style={styles.menuIcon}>{item.icon}</Text>
-              <View style={styles.menuInfo}>
-                <Text style={[styles.menuTitle, !item.screen && styles.menuTitleDisabled]}>{item.title}</Text>
-                <Text style={styles.menuSubtitle}>{item.subtitle}</Text>
-              </View>
-              <Text style={[styles.menuArrow, !item.screen && { opacity: 0.3 }]}>›</Text>
-            </TouchableOpacity>
-          ))}
+          {MENU_ITEMS.map((item) => {
+            const isActionable = !!item.screen || !!item.action;
+            return (
+              <TouchableOpacity
+                key={item.titleKey}
+                style={[styles.menuItem, !isActionable && styles.menuItemDisabled]}
+                onPress={() => handleMenuPress(item)}
+                activeOpacity={isActionable ? 0.7 : 1}
+              >
+                <Text style={styles.menuIcon}>{item.icon}</Text>
+                <View style={styles.menuInfo}>
+                  <Text style={[styles.menuTitle, !isActionable && styles.menuTitleDisabled]}>{t(item.titleKey)}</Text>
+                  <Text style={styles.menuSubtitle}>{t(item.subKey)}</Text>
+                </View>
+                <Text style={[styles.menuArrow, !isActionable && { opacity: 0.3 }]}>›</Text>
+              </TouchableOpacity>
+            );
+          })}
         </View>
 
         <TouchableOpacity style={styles.logoutBtn} onPress={handleLogout}>
-          <Text style={styles.logoutText}>Logout</Text>
+          <Text style={styles.logoutText}>{t('profile.logout')}</Text>
         </TouchableOpacity>
         <Text style={styles.version}>NavodayaSarthi v1.0.0</Text>
       </ScrollView>
+
+      {/* Language selector */}
+      <Modal visible={langModal} transparent animationType="fade" onRequestClose={() => setLangModal(false)}>
+        <TouchableOpacity style={styles.modalOverlay} activeOpacity={1} onPress={() => setLangModal(false)}>
+          <View style={styles.modalCard}>
+            <Text style={styles.modalTitle}>{t('profile.chooseLanguage')}</Text>
+            {LANGUAGES.map((lang) => {
+              const selected = i18n.language === lang.code;
+              return (
+                <TouchableOpacity
+                  key={lang.code}
+                  style={[styles.langOption, selected && styles.langOptionSelected]}
+                  onPress={() => changeLanguage(lang.code)}
+                  activeOpacity={0.7}
+                >
+                  <Text style={[styles.langLabel, selected && styles.langLabelSelected]}>{lang.label}</Text>
+                  {selected && <Text style={styles.langCheck}>✓</Text>}
+                </TouchableOpacity>
+              );
+            })}
+          </View>
+        </TouchableOpacity>
+      </Modal>
     </SafeAreaView>
   );
 }
@@ -153,4 +199,16 @@ const styles = StyleSheet.create({
   },
   logoutText: { color: colors.error, fontWeight: typography.weights.bold, fontSize: typography.sizes.md },
   version: { textAlign: 'center', color: colors.textLight, fontSize: typography.sizes.xs, marginBottom: spacing.xl },
+  modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.4)', justifyContent: 'center', paddingHorizontal: spacing.xl },
+  modalCard: { backgroundColor: colors.white, borderRadius: radius.xl, padding: spacing.lg },
+  modalTitle: { fontSize: typography.sizes.lg, fontWeight: typography.weights.extrabold, color: colors.text, marginBottom: spacing.md },
+  langOption: {
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
+    paddingVertical: spacing.md, paddingHorizontal: spacing.md, borderRadius: radius.md,
+    borderWidth: 2, borderColor: colors.border, marginBottom: spacing.sm,
+  },
+  langOptionSelected: { borderColor: colors.primary, backgroundColor: colors.primaryLight },
+  langLabel: { fontSize: typography.sizes.md, fontWeight: typography.weights.semibold, color: colors.text },
+  langLabelSelected: { color: colors.primary },
+  langCheck: { fontSize: typography.sizes.lg, fontWeight: typography.weights.extrabold, color: colors.primary },
 });

@@ -4,6 +4,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useDispatch, useSelector } from 'react-redux';
+import { useTranslation } from 'react-i18next';
 import { sendOtp, clearError } from '../../store/authSlice';
 import { isValidPhone, formatPhone } from '../../utils/validators';
 import { colors } from '../../theme/colors';
@@ -14,12 +15,13 @@ import { AppButton } from '../../components/common/AppButton';
 export default function LoginScreen({ navigation }) {
   const [phone, setPhone] = useState('');
   const dispatch = useDispatch();
+  const { t } = useTranslation();
   const { status, error } = useSelector((s) => s.auth);
 
   const handleSendOtp = async () => {
     const formatted = formatPhone(phone);
     if (!isValidPhone(formatted)) {
-      Alert.alert('Invalid Number', 'Please enter a valid 10-digit Indian mobile number.');
+      Alert.alert(t('auth.invalidNumberTitle'), t('auth.invalidNumberMsg'));
       return;
     }
     dispatch(clearError());
@@ -34,26 +36,26 @@ export default function LoginScreen({ navigation }) {
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1 }}>
         <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
           <TouchableOpacity style={styles.backBtn} onPress={() => navigation.goBack()}>
-            <Text style={styles.backText}>← Back</Text>
+            <Text style={styles.backText}>{t('common.back')}</Text>
           </TouchableOpacity>
 
           <View style={styles.logoArea}>
             <Image source={require('../../../assets/logo.jpg')} style={styles.logoImage} />
             <Text style={styles.logoTitle}>NavodayaSarthi</Text>
-            <Text style={styles.logoSub}>Welcome back!</Text>
+            <Text style={styles.logoSub}>{t('auth.welcomeBack')}</Text>
           </View>
 
-          <Text style={styles.title}>Login or Sign Up</Text>
-          <Text style={styles.subtitle}>Enter your mobile number to get started. New users will be registered automatically.</Text>
+          <Text style={styles.title}>{t('auth.loginOrSignup')}</Text>
+          <Text style={styles.subtitle}>{t('auth.loginSubtitle')}</Text>
 
-          <Text style={styles.label}>Mobile Number</Text>
+          <Text style={styles.label}>{t('auth.mobileNumber')}</Text>
           <View style={styles.phoneInputRow}>
             <View style={styles.countryCode}>
               <Text style={styles.countryCodeText}>🇮🇳 +91</Text>
             </View>
             <TextInput
               style={styles.phoneInput}
-              placeholder="Enter 10-digit number"
+              placeholder={t('auth.enterPhonePlaceholder')}
               placeholderTextColor={colors.textLight}
               value={phone}
               onChangeText={setPhone}
@@ -65,7 +67,7 @@ export default function LoginScreen({ navigation }) {
           {error && <Text style={styles.errorText}>{error}</Text>}
 
           <AppButton
-            title="Continue →"
+            title={t('common.continue')}
             onPress={handleSendOtp}
             loading={status === 'loading'}
             style={styles.btn}

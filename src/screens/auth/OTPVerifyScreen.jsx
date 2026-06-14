@@ -4,6 +4,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useDispatch, useSelector } from 'react-redux';
+import { useTranslation } from 'react-i18next';
 import { verifyOtp, sendOtp, clearError } from '../../store/authSlice';
 import { colors } from '../../theme/colors';
 import { typography } from '../../theme/typography';
@@ -17,6 +18,7 @@ export default function OTPVerifyScreen({ navigation, route }) {
   const [timer, setTimer] = useState(OTP_TIMER_SECONDS);
   const inputs = useRef([]);
   const dispatch = useDispatch();
+  const { t } = useTranslation();
   const { status, error, isNewUser } = useSelector((s) => s.auth);
 
   useEffect(() => {
@@ -59,13 +61,13 @@ export default function OTPVerifyScreen({ navigation, route }) {
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1 }}>
         <View style={styles.container}>
           <TouchableOpacity style={styles.backBtn} onPress={() => navigation.goBack()}>
-            <Text style={styles.backText}>← Back</Text>
+            <Text style={styles.backText}>{t('common.back')}</Text>
           </TouchableOpacity>
 
           <Text style={styles.emoji}>📱</Text>
-          <Text style={styles.title}>Verify OTP</Text>
+          <Text style={styles.title}>{t('auth.verifyOtp')}</Text>
           <Text style={styles.subtitle}>
-            We sent a 6-digit code to{'\n'}
+            {t('auth.otpSentTo')}{'\n'}
             <Text style={styles.phone}>+91 {phone}</Text>
           </Text>
 
@@ -89,7 +91,7 @@ export default function OTPVerifyScreen({ navigation, route }) {
           {error && <Text style={styles.errorText}>{error}</Text>}
 
           <AppButton
-            title="Verify OTP →"
+            title={t('auth.verifyOtpBtn')}
             onPress={handleVerify}
             loading={status === 'loading'}
             disabled={!otpComplete}
@@ -98,9 +100,9 @@ export default function OTPVerifyScreen({ navigation, route }) {
 
           <View style={styles.resendRow}>
             {timer > 0
-              ? <Text style={styles.timerText}>Resend OTP in <Text style={styles.timerNum}>{timer}s</Text></Text>
+              ? <Text style={styles.timerText}>{t('auth.resendIn')} <Text style={styles.timerNum}>{timer}s</Text></Text>
               : <TouchableOpacity onPress={handleResend}>
-                  <Text style={styles.resendText}>Resend OTP</Text>
+                  <Text style={styles.resendText}>{t('auth.resendOtp')}</Text>
                 </TouchableOpacity>
             }
           </View>

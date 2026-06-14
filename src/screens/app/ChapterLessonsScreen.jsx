@@ -10,6 +10,7 @@ import { AppLoader } from '../../components/common/AppLoader';
 import { colors } from '../../theme/colors';
 import { typography } from '../../theme/typography';
 import { spacing, radius } from '../../theme/spacing';
+import { pickLocalized } from '../../utils/localize';
 
 const TYPE_CONFIG = {
   video: { icon: '🎥', label: 'Video', color: colors.primary },
@@ -30,6 +31,7 @@ export default function ChapterLessonsScreen({ route, navigation }) {
   const { chapter, course } = route.params;
   const dispatch = useDispatch();
   const { lessons, completedIds, loading, error } = useSelector((s) => s.recorded);
+  const user = useSelector((s) => s.auth.user);
   const [activeTab, setActiveTab] = useState('unwatched');
 
   useEffect(() => {
@@ -43,6 +45,11 @@ export default function ChapterLessonsScreen({ route, navigation }) {
   const displayed = activeTab === 'unwatched' ? unwatched : watched;
 
   function openLesson(lesson) {
+    // A lesson is locked if it (or its course) is premium.
+    if ((lesson.isPremium || course?.isPremium) && !user?.isPremium) {
+      navigation.navigate('PremiumUpgrade');
+      return;
+    }
     navigation.navigate('LessonPlayer', { lesson, chapter, course });
   }
 
@@ -64,7 +71,7 @@ export default function ChapterLessonsScreen({ route, navigation }) {
 
         {/* Content */}
         <View style={styles.lessonContent}>
-          <Text style={styles.lessonTitle} numberOfLines={2}>{item.title}</Text>
+          <Text style={styles.lessonTitle} numberOfLines={2}>{pickLocalized(item, 'title')}</Text>
           <View style={styles.lessonMeta}>
             <TypeBadge type={item.type} />
             {item.durationMins > 0 && (
@@ -94,8 +101,8 @@ export default function ChapterLessonsScreen({ route, navigation }) {
           <Text style={styles.backText}>←</Text>
         </TouchableOpacity>
         <View style={{ flex: 1 }}>
-          <Text style={styles.title} numberOfLines={1}>{chapter.title}</Text>
-          <Text style={styles.subtitle}>{course?.title}</Text>
+          <Text style={styles.title} numberOfLines={1}>{pickLocalized(chapter, 'title')}</Text>
+          <Text style={styles.subtitle}>{pickLocalized(course, 'title')}</Text>
         </View>
       </View>
 

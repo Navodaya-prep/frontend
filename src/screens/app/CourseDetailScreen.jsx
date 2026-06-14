@@ -10,6 +10,7 @@ import { AppLoader } from '../../components/common/AppLoader';
 import { colors } from '../../theme/colors';
 import { typography } from '../../theme/typography';
 import { spacing, radius } from '../../theme/spacing';
+import { pickLocalized } from '../../utils/localize';
 
 const SUBJECT_COLORS = {
   mental_ability: colors.primary,
@@ -24,11 +25,18 @@ export default function CourseDetailScreen({ route, navigation }) {
   const { course } = route.params;
   const dispatch = useDispatch();
   const { chapters, totalLessons, completedCount, loading, error } = useSelector((s) => s.recorded);
+  const user = useSelector((s) => s.auth.user);
 
   useEffect(() => {
     dispatch(fetchChaptersWithProgress(course.id));
     return () => dispatch(clearCourseData());
   }, [course.id]);
+
+  // A chapter is locked if it's premium, or its course is premium.
+  const openChapter = (chapter) => {
+    if ((chapter.isPremium || course.isPremium) && !user?.isPremium) navigation.navigate('PremiumUpgrade');
+    else navigation.navigate('ChapterLessons', { chapter, course });
+  };
 
   const overallPct = totalLessons > 0 ? Math.round((completedCount / totalLessons) * 100) : 0;
   const subjectColor = SUBJECT_COLORS[course.subject] || colors.primary;
@@ -43,14 +51,14 @@ export default function CourseDetailScreen({ route, navigation }) {
       <TouchableOpacity
         style={[styles.chapterCard, isComplete && styles.chapterCardComplete]}
         activeOpacity={0.8}
-        onPress={() => navigation.navigate('ChapterLessons', { chapter: item, course })}
+        onPress={() => openChapter(item)}
       >
         <View style={[styles.chapterNum, { backgroundColor: subjectColor + '20' }]}>
           <Text style={[styles.chapterNumText, { color: subjectColor }]}>{index + 1}</Text>
         </View>
         <View style={styles.chapterInfo}>
           <View style={styles.chapterTop}>
-            <Text style={styles.chapterTitle} numberOfLines={2}>{item.title}</Text>
+            <Text style={styles.chapterTitle} numberOfLines={2}>{pickLocalized(item, 'title')}</Text>
             {isComplete && (
               <View style={styles.completeBadge}>
                 <Text style={styles.completeBadgeText}>✓</Text>
@@ -81,7 +89,7 @@ export default function CourseDetailScreen({ route, navigation }) {
       <View style={[styles.banner, { backgroundColor: subjectColor }]}>
         <Text style={styles.bannerEmoji}>{course.thumbnail || '🎥'}</Text>
         <View style={styles.bannerInfo}>
-          <Text style={styles.bannerTitle}>{course.title}</Text>
+          <Text style={styles.bannerTitle}>{pickLocalized(course, 'title')}</Text>
           <View style={styles.bannerMeta}>
             {course.classLevel ? (
               <View style={styles.metaBadge}>
@@ -145,7 +153,7 @@ export default function CourseDetailScreen({ route, navigation }) {
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
           <Text style={[styles.backText, { color: subjectColor }]}>←</Text>
         </TouchableOpacity>
-        <Text style={styles.topBarTitle} numberOfLines={1}>{course.title}</Text>
+        <Text style={styles.topBarTitle} numberOfLines={1}>{pickLocalized(course, 'title')}</Text>
         <View style={{ width: 36 }} />
       </View>
 
@@ -184,7 +192,7 @@ function renderHeader(course, color, navigation) {
       <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
         <Text style={[styles.backText, { color }]}>←</Text>
       </TouchableOpacity>
-      <Text style={styles.topBarTitle} numberOfLines={1}>{course.title}</Text>
+      <Text style={styles.topBarTitle} numberOfLines={1}>{pickLocalized(course, 'title')}</Text>
       <View style={{ width: 36 }} />
     </View>
   );

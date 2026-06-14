@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useTranslation } from 'react-i18next';
 import DashboardScreen from '../screens/app/DashboardScreen';
 import DoubtsScreen from '../screens/app/DoubtsScreen';
 import ProfileScreen from '../screens/app/ProfileScreen';
@@ -18,8 +19,16 @@ const TAB_ICONS = {
   Profile: { active: '👤', inactive: '👥' },
 };
 
+const TAB_LABEL_KEYS = {
+  Home: 'tabs.home',
+  Live: 'tabs.live',
+  Doubts: 'tabs.doubts',
+  Profile: 'tabs.profile',
+};
+
 export default function BottomTabNavigator() {
   const insets = useSafeAreaInsets();
+  const { t } = useTranslation();
 
   return (
     <Tab.Navigator
@@ -29,6 +38,7 @@ export default function BottomTabNavigator() {
         tabBarInactiveTintColor: colors.textLight,
         tabBarStyle: [styles.tabBar, { height: 60 + insets.bottom, paddingBottom: insets.bottom + 8 }],
         tabBarLabelStyle: styles.tabLabel,
+        tabBarLabel: t(TAB_LABEL_KEYS[route.name] || route.name),
         tabBarIcon: ({ focused }) => (
           <Text style={{ fontSize: 22 }}>
             {focused ? TAB_ICONS[route.name]?.active : TAB_ICONS[route.name]?.inactive}

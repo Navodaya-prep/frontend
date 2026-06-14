@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View, Text, TouchableOpacity, StyleSheet,
   ScrollView, Alert,
@@ -10,12 +10,21 @@ import { markLessonComplete } from '../../store/recordedSlice';
 import { colors } from '../../theme/colors';
 import { typography } from '../../theme/typography';
 import { spacing, radius } from '../../theme/spacing';
+import { pickLocalized } from '../../utils/localize';
 
 export default function LessonPlayerScreen({ route, navigation }) {
   const { lesson, chapter, course } = route.params;
   const dispatch = useDispatch();
   const { completedIds } = useSelector((s) => s.recorded);
+  const user = useSelector((s) => s.auth.user);
   const [marking, setMarking] = useState(false);
+
+  // Defensive gate — never play locked content even if reached directly.
+  useEffect(() => {
+    if ((lesson.isPremium || course?.isPremium) && !user?.isPremium) {
+      navigation.replace('PremiumUpgrade');
+    }
+  }, []);
 
   const isCompleted = completedIds.includes(lesson.id);
 
@@ -59,8 +68,8 @@ export default function LessonPlayerScreen({ route, navigation }) {
           <Text style={styles.backText}>←</Text>
         </TouchableOpacity>
         <View style={{ flex: 1 }}>
-          <Text style={styles.title} numberOfLines={1}>{lesson.title}</Text>
-          <Text style={styles.subtitle} numberOfLines={1}>{chapter?.title} · {course?.title}</Text>
+          <Text style={styles.title} numberOfLines={1}>{pickLocalized(lesson, 'title')}</Text>
+          <Text style={styles.subtitle} numberOfLines={1}>{pickLocalized(chapter, 'title')} · {pickLocalized(course, 'title')}</Text>
         </View>
         {isCompleted && (
           <View style={styles.watchedBadge}>

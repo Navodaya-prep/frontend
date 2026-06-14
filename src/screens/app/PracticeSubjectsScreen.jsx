@@ -10,6 +10,7 @@ import { AppLoader } from '../../components/common/AppLoader';
 import { colors } from '../../theme/colors';
 import { typography } from '../../theme/typography';
 import { spacing, radius } from '../../theme/spacing';
+import { pickLocalized } from '../../utils/localize';
 
 export default function PracticeSubjectsScreen({ navigation }) {
   const dispatch = useDispatch();
@@ -31,7 +32,7 @@ export default function PracticeSubjectsScreen({ navigation }) {
           <Text style={styles.icon}>{item.icon || '📚'}</Text>
         </View>
         <View style={styles.info}>
-          <Text style={styles.name}>{item.name}</Text>
+          <Text style={styles.name}>{pickLocalized(item, 'name')}</Text>
           {item.description ? (
             <Text style={styles.desc} numberOfLines={1}>{item.description}</Text>
           ) : null}

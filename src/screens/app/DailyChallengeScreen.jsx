@@ -5,6 +5,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useDispatch, useSelector } from 'react-redux';
+import { useTranslation } from 'react-i18next';
 import {
   fetchTodayChallenge, submitChallenge, revealChallenge,
 } from '../../store/dailyChallengeSlice';
@@ -12,11 +13,13 @@ import { colors } from '../../theme/colors';
 import { typography } from '../../theme/typography';
 import { radius, spacing } from '../../theme/spacing';
 import { AppLoader } from '../../components/common/AppLoader';
+import { pickLocalized } from '../../utils/localize';
 
 const OPTION_LETTERS = ['A', 'B', 'C', 'D'];
 
 export default function DailyChallengeScreen({ navigation }) {
   const dispatch = useDispatch();
+  useTranslation(); // re-render when language changes
   const { challenge, status, submitStatus } = useSelector((s) => s.dailyChallenge);
 
   const [selected, setSelected] = useState(null);
@@ -173,10 +176,7 @@ export default function DailyChallengeScreen({ navigation }) {
               ) : null}
             </View>
 
-            <Text style={styles.questionText}>{challenge.text}</Text>
-            {challenge.textHi ? (
-              <Text style={styles.questionTextHi}>{challenge.textHi}</Text>
-            ) : null}
+            <Text style={styles.questionText}>{pickLocalized(challenge, 'text')}</Text>
 
             {/* Options */}
             <View style={styles.optionsContainer}>
